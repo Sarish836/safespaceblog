@@ -1034,8 +1034,25 @@ function NewPostModal({ onSave, onClose }){
 // ─── App root ─────────────────────────────────────────────────────────────────
 export default function App(){
   const [view, setView] = useState("home");
-  const [articles, setArticles] = useState(INIT_ARTICLES);
-  const [users, setUsers] = useState(INIT_USERS);
+  const [articles, setArticles] = useState(() => {
+    try {
+      const saved = localStorage.getItem("sss_articles");
+      return saved ? JSON.parse(saved) : INIT_ARTICLES;
+    } catch { return INIT_ARTICLES; }
+  });
+  const [users, setUsers] = useState(() => {
+    try {
+      const saved = localStorage.getItem("sss_users");
+      return saved ? JSON.parse(saved) : INIT_USERS;
+    } catch { return INIT_USERS; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("sss_articles", JSON.stringify(articles)); } catch {}
+  }, [articles]);
+
+  useEffect(() => {
+    try { localStorage.setItem("sss_users", JSON.stringify(users)); } catch {}
+  }, [users]);
   const [currentUser, setCurrentUser] = useState(null);
   const [readArticle, setReadArticle] = useState(null);
 
