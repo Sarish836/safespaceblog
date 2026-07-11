@@ -675,25 +675,31 @@ function DashboardView({ currentUser, articles, setArticles }){
 
   function submitNew(){
     if (!form.title||!form.body) return;
-    setArticles(p=>[...p,{
+    const newArticle = {
       id:Date.now(),authorId:currentUser.id,authorName:currentUser.name,
       title:form.title,body:form.body,category:form.category,
       submittedAt:new Date().toISOString().slice(0,10),
       isApproved:false,status:"pending",revisions:[],
       imageDataUrl:form.imageDataUrl||null,
-    }]);
+    };
+    setArticles(p=>[...p,newArticle]);
+    supabase.from('articles').upsert({ id: String(newArticle.id), data: newArticle }).then(({error})=>{ if(error) console.error(error); });
     setSubmitted(true);
   }
+
 
   function submitRevision(articleId){
     if (!revBody.trim()) return;
     setArticles(p=>p.map(a=>{
       if (a.id!==articleId) return a;
-      return {...a,body:revBody,status:"pending",isApproved:false,
+      const updated = {...a,body:revBody,status:"pending",isApproved:false,
         revisions:[...(a.revisions||[]),{type:"contributor-revision",body:revBody,date:new Date().toISOString().slice(0,10)}]};
+      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      return updated;
     }));
     setRevisingId(null);setRevBody("");
   }
+
 
   const mine = articles.filter(a=>a.authorId===currentUser.id);
 
@@ -794,17 +800,31 @@ function AdminView({ articles, setArticles }){
   ];
   const list = articles.filter(a=>a.status===tab);
 
-  function approve(id){ setArticles(p=>p.map(a=>a.id===id?{...a,isApproved:true,status:"approved"}:a)); }
-  function deleteArticle(id){ setArticles(p=>p.filter(a=>a.id!==id)); }
+  function approve(id){
+    setArticles(p=>p.map(a=>{
+      if (a.id!==id) return a;
+      const updated = {...a,isApproved:true,status:"approved"};
+      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      return updated;
+    }));
+  }
+  function deleteArticle(id){
+    setArticles(p=>p.filter(a=>a.id!==id));
+    supabase.from('articles').delete().eq('id', String(id)).then(({error})=>{ if(error) console.error(error); });
+  }
+
 
   function reject(id){
     setArticles(p=>p.map(a=>{
       if (a.id!==id) return a;
-      return {...a,isApproved:false,status:"rejected",
+      const updated = {...a,isApproved:false,status:"rejected",
         revisions:[...(a.revisions||[]),...(fbText.trim()?[{type:"admin-feedback",comment:fbText.trim(),date:new Date().toISOString().slice(0,10)}]:[])]};
+      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      return updated;
     }));
     setFbModal(null);setFbText("");
   }
+
 
   function sendRevisions(articleId){
     const comment = fbText.trim(); const edit = editText.trim();
@@ -814,27 +834,35 @@ function AdminView({ articles, setArticles }){
       const newRevs=[...(a.revisions||[])];
       if (comment) newRevs.push({type:"admin-feedback",comment,date:new Date().toISOString().slice(0,10)});
       if (edit) newRevs.push({type:"admin-edit",suggestedText:edit,date:new Date().toISOString().slice(0,10)});
-      return {...a,isApproved:false,status:"revisions",revisions:newRevs};
+      const updated = {...a,isApproved:false,status:"revisions",revisions:newRevs};
+      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      return updated;
     }));
     setFbModal(null);setFbText("");setEditText("");
   }
 
+
   function saveEdit(updated){
     setArticles(p=>p.map(a=>a.id===updated.id?updated:a));
+    supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
     setEditModal(null);
   }
 
+
   function createPost(data){
-    setArticles(p=>[...p,{
+    const newArticle = {
       id:Date.now(),authorId:1,authorName:"Admin",
       title:data.title,body:data.body,category:data.category,
       submittedAt:data.date||new Date().toISOString().slice(0,10),
       isApproved:true,status:"approved",revisions:[],
       imageDataUrl:data.imageDataUrl||null,
       videoUrl:data.videoUrl||null,videoCaption:data.videoCaption||null,
-    }]);
+    };
+    setArticles(p=>[...p,newArticle]);
+    supabase.from('articles').upsert({ id: String(newArticle.id), data: newArticle }).then(({error})=>{ if(error) console.error(error); });
     setPostModal(false);
   }
+
 
   function ArticleRow({a}){
     const isOpen = expanded===a.id;
