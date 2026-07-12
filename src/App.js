@@ -35,41 +35,7 @@ function hasCrisis(text) {
 
 // ─── Initial data ─────────────────────────────────────────────────────────────
 const INIT_USERS = [
-  { id:1, email:ADMIN_EMAIL, password:"admin123", role:"Admin", name:"Admin" },
-  { id:2, email:"jane@example.com", password:"pass123", role:"Contributor", name:"Jane M." },
-];
-
-const INIT_ARTICLES = [
-  {
-    id:1, authorId:2, authorName:"Jane M.",
-    title:"How journaling helped me survive my worst semester",
-    body:"I never thought putting pen to paper could change anything. But during my worst semester, when anxiety had me paralyzed before every exam, my therapist suggested a five-minute morning journal.\n\nThe first week felt pointless. I wrote three sentences and closed the notebook. By week two, I was filling pages. Something shifted — the act of externalizing the noise in my head gave me just enough distance to breathe.\n\nIf you've never tried it, start small. One sentence about how you feel right now. That's enough.",
-    category:"reality-check", submittedAt:"2026-05-01", isApproved:true, status:"approved",
-    revisions:[], imageDataUrl:null,
-  },
-  {
-    id:2, authorId:2, authorName:"Jane M.",
-    title:"The 5-4-3-2-1 grounding technique: a step-by-step walkthrough",
-    body:"The 5-4-3-2-1 grounding technique is one of the most portable coping tools available — no equipment needed, usable anywhere.\n\nHere's how it works:\n\n5 things you can SEE — Look around and name five specific things. Not just 'a chair' — 'the blue chair with the worn armrest.'\n\n4 things you can TOUCH — Feel the texture of your shirt, the temperature of the air, the ground beneath your feet.\n\n3 things you can HEAR — Background hum, birdsong, your own breathing.\n\n2 things you can SMELL — Even subtle ones. Coffee? Fresh air?\n\n1 thing you can TASTE — Whatever is lingering right now.\n\nThis sequence pulls your nervous system out of the threat-response loop by anchoring it in present sensory reality.",
-    category:"toolkit", submittedAt:"2026-05-10", isApproved:true, status:"approved",
-    revisions:[], imageDataUrl:null,
-    videoUrl:"https://www.youtube.com/embed/tybOi4hjZFQ",
-    videoCaption:"Guided box breathing walkthrough",
-  },
-  {
-    id:3, authorId:2, authorName:"Jane M.",
-    title:"What your amygdala is actually doing when you panic",
-    body:"The amygdala is often called the brain's alarm bell — a small, almond-shaped cluster of neurons deep in the temporal lobe that processes emotional responses, particularly fear.\n\nWhen you encounter a perceived threat — whether it's a bear on a hiking trail or a passive-aggressive email from your boss — the amygdala fires before your prefrontal cortex receives the signal.\n\nThis is called the amygdala hijack. Your body floods with cortisol and adrenaline. Heart rate spikes. Breathing shallows.\n\nThe key insight: your amygdala cannot distinguish between a physical threat and a social one. To it, a public-speaking event registers the same as a predator. Understanding this won't stop the response — but it gives you leverage to interrupt it.",
-    category:"mind-mechanics", submittedAt:"2026-05-15", isApproved:true, status:"approved",
-    revisions:[], imageDataUrl:null,
-  },
-  {
-    id:4, authorId:2, authorName:"Jane M.",
-    title:"My anxiety at work: a story of small wins",
-    body:"Every Monday morning I would sit in my car for twenty minutes before walking into the office. The dread wasn't about any one thing — it was the accumulation of small uncertainties.\n\nI started keeping a tiny notebook specifically for work anxiety. Not a journal — just a running list of the fears that surfaced each day, and then a single line: what actually happened.\n\nAfter four weeks, a pattern emerged. Roughly 80% of my fears never materialized.",
-    category:"reality-check", submittedAt:"2026-05-28", isApproved:false, status:"pending",
-    revisions:[], imageDataUrl:null,
-  },
+  { id:1, email:ADMIN_EMAIL, password:"admin123", role:"Admin", name:"Admin" }
 ];
 
 const CATS = [
