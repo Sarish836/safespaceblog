@@ -294,7 +294,12 @@ function ArticleModal({ article, onClose }){
 
 // ─── Home ─────────────────────────────────────────────────────────────────────
 function HomeView({ articles, setView, onRead }){
-  const approved = articles.filter(a=>a.isApproved);
+  const approved = articles
+    .filter(a => a?.isApproved)
+    .sort((a, b) =>
+      String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")) ||
+      Number(b.id) - Number(a.id)
+    );
   return (
     <div>
       <div className="hero-section" style={{padding:"5rem 20px"}}>
@@ -350,7 +355,13 @@ function HomeView({ articles, setView, onRead }){
 
 function CategoryView({ category, articles, onRead }){
   const cat = CATS.find(c=>c.id===category);
-  const items = articles.filter(a=>a.isApproved && a.category===category);
+  const items = articles
+    .filter(a => a?.isApproved && a.category === category)
+    .sort((a, b) =>
+      String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")) ||
+      Number(b.id) - Number(a.id)
+    );
+
   return (
     <div style={{maxWidth:1120,margin:"0 auto",padding:"3rem 20px"}}>
       <div style={{marginBottom:"2.5rem"}}>
@@ -1030,39 +1041,75 @@ function NewPostModal({ onSave, onClose }){
 export default function App(){
   const [view, setView] = useState("home");
   const [articles, setArticles] = useState([]);
-  useEffect(() => {
+    useEffect(() => {
+    const sortArticles = (items) =>
+      [...items]
+        .filter(Boolean)
+        .sort((a, b) =>
+          String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")) ||
+          Number(b.id) - Number(a.id)
+        );
+
     async function load() {
-      const { data, error } = await supabase.from('articles').select('*');
+      const { data, error } = await supabase
+        .from('articles')
+        .select('id, data');
+
       if (error) {
-        console.error('Supabase load error:', error);
-        setArticles(INIT_ARTICLES);
+        console.error('Database load error:', error);
+        setArticles([]);
         return;
       }
-      if (data && data.length > 0) {
-        setArticles(data.map(row => row.data));
-      } else {
-        const seed = INIT_ARTICLES.map(a => ({ id: String(a.id), data: a }));
-        await supabase.from('articles').upsert(seed);
-        setArticles(INIT_ARTICLES);
-      }
+
+      setArticles(sortArticles((data || []).map(row => row.data)));
     }
+
     load();
 
     const channel = supabase
-      .channel('articles')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'articles' }, payload => {
-        if (payload.eventType === 'INSERT') {
-          setArticles(prev => prev.some(a => String(a.id) === String(payload.new.id)) ? prev : [...prev, payload.new.data]);
-        } else if (payload.eventType === 'UPDATE') {
-          setArticles(prev => prev.map(a => String(a.id) === String(payload.new.id) ? payload.new.data : a));
-        } else if (payload.eventType === 'DELETE') {
-          setArticles(prev => prev.filter(a => String(a.id) !== String(payload.old.id)));
-        }
-      })
-      .subscribe();
+      .channel('articles-live-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'articles',
+        },
+        (payload) => {
+          console.log('Article change received:', payload);
 
-    return () => { supabase.removeChannel(channel); };
+          if (payload.eventType === 'DELETE') {
+            const deletedId = payload.old?.id || payload.old?.data?.id;
+
+            setArticles(prev =>
+              prev.filter(article => String(article.id) !== String(deletedId))
+            );
+
+            return;
+          }
+
+          const incomingArticle = payload.new?.data;
+
+          if (!incomingArticle) return;
+
+          setArticles(prev => {
+            const withoutOldCopy = prev.filter(
+              article => String(article.id) !== String(incomingArticle.id)
+            );
+
+            return sortArticles([...withoutOldCopy, incomingArticle]);
+          });
+        }
+      )
+      .subscribe(status => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
+
 
   const [users, setUsers] = useState(() => {
     try {
@@ -1070,9 +1117,6 @@ export default function App(){
       return saved ? JSON.parse(saved) : INIT_USERS;
     } catch { return INIT_USERS; }
   });
-  useEffect(() => {
-    try { localStorage.setItem("sss_articles", JSON.stringify(articles)); } catch {}
-  }, [articles]);
 
   useEffect(() => {
     try { localStorage.setItem("sss_users", JSON.stringify(users)); } catch {}
