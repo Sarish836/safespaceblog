@@ -23,9 +23,22 @@ const C = {
 const ADMIN_EMAIL = "admin@safespace.com";
 
 // ─── Initial data ─────────────────────────────────────────────────────────────
-const INIT_USERS = [
-  { id:1, email:ADMIN_EMAIL, password:"admin123", role:"Admin", name:"Admin" }
-];
+// Contributor accounts live in this browser only. The admin account is not
+// stored here: the admin password is checked by the database (admin_check).
+const INIT_USERS = [];
+
+// Admin writes go through password-checked database functions; the public
+// key can only add new "pending" submissions.
+async function adminSave(pass, article){
+  const { error } = await supabase.rpc("admin_save_article", { pass, article });
+  if (error){ console.error(error); alert("Couldn't save that change: " + error.message); return false; }
+  return true;
+}
+async function adminDelete(pass, id){
+  const { error } = await supabase.rpc("admin_delete_article", { pass, article_id: String(id) });
+  if (error){ console.error(error); alert("Couldn't delete: " + error.message); return false; }
+  return true;
+}
 
 const CATS = [
   { id:"reality-check", label:"The Reality Check", badge:"badge-coral", desc:"Peer essays & relatable stories" },
@@ -150,6 +163,8 @@ a{color:inherit;text-decoration:none;}
   .nav-desktop{display:none!important;}
   .hub-grid{grid-template-columns:1fr;}
   .brand-name{display:none;}
+  .header-actions{flex-shrink:1!important;flex-wrap:wrap;justify-content:flex-end;gap:6px!important;}
+  .header-actions button{padding:7px 12px!important;font-size:12px!important;}
 }
 `;
 
@@ -165,7 +180,7 @@ function Logo({ size=36 }){
 function Header({ view, setView, currentUser, setCurrentUser }){
   return (
     <header style={{background:"#fff",borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:50}}>
-      <div style={{maxWidth:1120,margin:"0 auto",padding:"0 20px",height:66,display:"flex",alignItems:"center",gap:20}}>
+      <div style={{maxWidth:1120,margin:"0 auto",padding:"10px 16px",minHeight:66,display:"flex",alignItems:"center",gap:16}}>
         <button onClick={()=>setView("home")} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer",flexShrink:0}}>
           <Logo size={38}/>
           <span className="serif brand-name" style={{fontSize:18,color:C.teal800,fontWeight:600,lineHeight:1.1,whiteSpace:"nowrap"}}>The Safe Space Blog</span>
@@ -173,7 +188,7 @@ function Header({ view, setView, currentUser, setCurrentUser }){
         <nav className="nav-desktop" style={{display:"flex",gap:24,flex:1,marginLeft:16}}>
           {CATS.map(c=><button key={c.id} className={`nav-link ${view===c.id?"active":""}`} onClick={()=>setView(c.id)}>{c.label}</button>)}
         </nav>
-        <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+        <div className="header-actions" style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
           <button className="btn-primary" style={{background:C.teal600,fontSize:13,padding:"9px 18px"}} onClick={()=>setView("talk")}>
             💬 Talk to Someone
           </button>
@@ -444,8 +459,17 @@ function AuthView({ users, setUsers, setCurrentUser, setView }){
   const [err, setErr] = useState("");
 
   // Hide admin login from registration — admin can still sign in but no hint shown
-  function submit(){
+  const [busy, setBusy] = useState(false);
+  async function submit(){
     setErr("");
+    if (mode==="signin"&&form.email.trim().toLowerCase()===ADMIN_EMAIL){
+      setBusy(true);
+      const { data, error } = await supabase.rpc("admin_check", { pass: form.password });
+      setBusy(false);
+      if (error||data!==true){ setErr("Invalid email or password."); return; }
+      setCurrentUser({ id:1, email:ADMIN_EMAIL, role:"Admin", name:"Admin", pass: form.password });
+      setView("admin"); return;
+    }
     if (mode==="signin"){
       const u = users.find(u=>u.email===form.email&&u.password===form.password);
       if (!u){setErr("Invalid email or password.");return;}
@@ -474,7 +498,7 @@ function AuthView({ users, setUsers, setCurrentUser, setView }){
         <div style={{marginBottom:14}}><label style={{fontSize:13,color:C.mid,display:"block",marginBottom:6,fontWeight:600}}>Email</label><input className="input-field" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} placeholder="you@email.com"/></div>
         <div style={{marginBottom:20}}><label style={{fontSize:13,color:C.mid,display:"block",marginBottom:6,fontWeight:600}}>Password</label><input className="input-field" type="password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))} placeholder="••••••••"/></div>
         {err&&<p style={{fontSize:13,color:C.coral400,marginBottom:14}}>⚠ {err}</p>}
-        <button className="btn-primary" style={{width:"100%",padding:"12px"}} onClick={submit}>{mode==="signin"?"Sign In":"Create Account"}</button>
+        <button className="btn-primary" style={{width:"100%",padding:"12px"}} onClick={submit} disabled={busy}>{mode==="signin"?"Sign In":"Create Account"}</button>
       </div>
     </div>
   );
@@ -534,7 +558,7 @@ function DashboardView({ currentUser, articles, setArticles }){
       imageDataUrl:form.imageDataUrl||null,
     };
     setArticles(p=>[...p,newArticle]);
-    supabase.from('articles').upsert({ id: String(newArticle.id), data: newArticle }).then(({error})=>{ if(error) console.error(error); });
+    supabase.from('articles').insert({ id: String(newArticle.id), data: newArticle }).then(({error})=>{ if(error){ console.error(error); alert("Sorry, your submission couldn't be saved. Please try again."); } });
     setSubmitted(true);
   }
 
@@ -545,9 +569,9 @@ function DashboardView({ currentUser, articles, setArticles }){
       if (a.id!==articleId) return a;
       const updated = {...a,body:revBody,status:"pending",isApproved:false,
         revisions:[...(a.revisions||[]),{type:"contributor-revision",body:revBody,date:new Date().toISOString().slice(0,10)}]};
-      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
       return updated;
     }));
+    supabase.rpc("resubmit_article", { article_id: String(articleId), new_body: revBody }).then(({error})=>{ if(error){ console.error(error); alert("Sorry, your revision couldn't be saved. Please try again."); } });
     setRevisingId(null);setRevBody("");
   }
 
@@ -632,7 +656,7 @@ function DashboardView({ currentUser, articles, setArticles }){
 }
 
 // ─── Admin portal ─────────────────────────────────────────────────────────────
-function AdminView({ articles, setArticles }){
+function AdminView({ articles, setArticles, pass }){
   const [tab, setTab] = useState("pending");
   const [expanded, setExpanded] = useState(null);
   const [fbModal, setFbModal] = useState(null); // {articleId, mode}
@@ -654,13 +678,13 @@ function AdminView({ articles, setArticles }){
     setArticles(p=>p.map(a=>{
       if (a.id!==id) return a;
       const updated = {...a,isApproved:true,status:"approved"};
-      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      adminSave(pass, updated);
       return updated;
     }));
   }
   function deleteArticle(id){
     setArticles(p=>p.filter(a=>a.id!==id));
-    supabase.from('articles').delete().eq('id', String(id)).then(({error})=>{ if(error) console.error(error); });
+    adminDelete(pass, id);
   }
 
 
@@ -669,7 +693,7 @@ function AdminView({ articles, setArticles }){
       if (a.id!==id) return a;
       const updated = {...a,isApproved:false,status:"rejected",
         revisions:[...(a.revisions||[]),...(fbText.trim()?[{type:"admin-feedback",comment:fbText.trim(),date:new Date().toISOString().slice(0,10)}]:[])]};
-      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      adminSave(pass, updated);
       return updated;
     }));
     setFbModal(null);setFbText("");
@@ -685,7 +709,7 @@ function AdminView({ articles, setArticles }){
       if (comment) newRevs.push({type:"admin-feedback",comment,date:new Date().toISOString().slice(0,10)});
       if (edit) newRevs.push({type:"admin-edit",suggestedText:edit,date:new Date().toISOString().slice(0,10)});
       const updated = {...a,isApproved:false,status:"revisions",revisions:newRevs};
-      supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+      adminSave(pass, updated);
       return updated;
     }));
     setFbModal(null);setFbText("");setEditText("");
@@ -694,7 +718,7 @@ function AdminView({ articles, setArticles }){
 
   function saveEdit(updated){
     setArticles(p=>p.map(a=>a.id===updated.id?updated:a));
-    supabase.from('articles').upsert({ id: String(updated.id), data: updated }).then(({error})=>{ if(error) console.error(error); });
+    adminSave(pass, updated);
     setEditModal(null);
   }
 
@@ -709,7 +733,7 @@ function AdminView({ articles, setArticles }){
       videoUrl:data.videoUrl||null,videoCaption:data.videoCaption||null,
     };
     setArticles(p=>[...p,newArticle]);
-    supabase.from('articles').upsert({ id: String(newArticle.id), data: newArticle }).then(({error})=>{ if(error) console.error(error); });
+    adminSave(pass, newArticle);
     setPostModal(false);
   }
 
@@ -987,7 +1011,7 @@ export default function App(){
   const [users, setUsers] = useState(() => {
     try {
       const saved = localStorage.getItem("sss_users");
-      return saved ? JSON.parse(saved) : INIT_USERS;
+      return saved ? JSON.parse(saved).filter(u=>u&&u.role!=="Admin") : INIT_USERS;
     } catch { return INIT_USERS; }
   });
 
@@ -1013,9 +1037,9 @@ export default function App(){
           {view==="home"&&<HomeView articles={articles} setView={safeSetView} onRead={setReadArticle}/>}
           {(view==="reality-check"||view==="mind-mechanics"||view==="toolkit")&&<CategoryView category={view} articles={articles} onRead={setReadArticle}/>}
           {view==="talk"&&<TalkPage/>}
-          {view==="auth"&&<AuthView users={users} setUsers={setUsers} setCurrentUser={setCurrentUser} setView={safeSetView}/>}
+          {view==="auth"&&<AuthView users={users} setUsers={setUsers} setCurrentUser={setCurrentUser} setView={setView}/>}
           {view==="dashboard"&&currentUser&&<DashboardView currentUser={currentUser} articles={articles} setArticles={setArticles}/>}
-          {view==="admin"&&currentUser?.role==="Admin"&&<AdminView articles={articles} setArticles={setArticles}/>}
+          {view==="admin"&&currentUser?.role==="Admin"&&<AdminView articles={articles} setArticles={setArticles} pass={currentUser.pass}/>}
         </main>
         <Footer setView={safeSetView}/>
         {readArticle&&<ArticleModal article={readArticle} onClose={()=>setReadArticle(null)}/>}
