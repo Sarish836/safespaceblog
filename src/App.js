@@ -22,17 +22,6 @@ const C = {
 
 const ADMIN_EMAIL = "admin@safespace.com";
 
-const CRISIS_KEYWORDS = [
-  "kill myself","end my life","want to die","suicidal","suicide","self harm",
-  "self-harm","hurt myself","cut myself","overdose","don't want to be here",
-  "don't want to live","no reason to live","better off dead","end it all",
-  "ending it","not worth living","take my life","harm myself",
-];
-function hasCrisis(text) {
-  const l = text.toLowerCase();
-  return CRISIS_KEYWORDS.some(k => l.includes(k));
-}
-
 // ─── Initial data ─────────────────────────────────────────────────────────────
 const INIT_USERS = [
   { id:1, email:ADMIN_EMAIL, password:"admin123", role:"Admin", name:"Admin" }
@@ -160,11 +149,9 @@ a{color:inherit;text-decoration:none;}
 @media(max-width:640px){
   .nav-desktop{display:none!important;}
   .hub-grid{grid-template-columns:1fr;}
+  .brand-name{display:none;}
 }
 `;
-
-// ─── Crisis message ───────────────────────────────────────────────────────────
-const CRISIS_MSG = {type:"crisis",text:"Support is available right now — you are not alone.\n\nIf you are going through a difficult time or having thoughts of self-harm, please reach out to a trained professional immediately."};
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 function CrisisBar(){
@@ -181,7 +168,7 @@ function Header({ view, setView, currentUser, setCurrentUser }){
       <div style={{maxWidth:1120,margin:"0 auto",padding:"0 20px",height:66,display:"flex",alignItems:"center",gap:20}}>
         <button onClick={()=>setView("home")} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer",flexShrink:0}}>
           <Logo size={38}/>
-          <span className="serif" style={{fontSize:18,color:C.teal800,fontWeight:600,lineHeight:1.1,whiteSpace:"nowrap"}}>The Safe Space Blog</span>
+          <span className="serif brand-name" style={{fontSize:18,color:C.teal800,fontWeight:600,lineHeight:1.1,whiteSpace:"nowrap"}}>The Safe Space Blog</span>
         </button>
         <nav className="nav-desktop" style={{display:"flex",gap:24,flex:1,marginLeft:16}}>
           {CATS.map(c=><button key={c.id} className={`nav-link ${view===c.id?"active":""}`} onClick={()=>setView(c.id)}>{c.label}</button>)}
@@ -377,111 +364,78 @@ function CategoryView({ category, articles, onRead }){
 
 // ─── Talk page ────────────────────────────────────────────────────────────────
 function TalkPage(){
-  const [agreed, setAgreed] = useState(false);
-  const [messages, setMessages] = useState([
-    {role:"bot",text:"Hi, I'm really glad you're here 💚 I'm a peer-support companion — not a therapist, but a safe space to share what's on your mind. How are you feeling today?"}
-  ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [crisisMode, setCrisisMode] = useState(false);
-  const bottomRef = useRef(null);
-
-  useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"});},[messages]);
-
-  async function send(){
-    const text = input.trim();
-    if (!text||loading) return;
-    setInput("");
-    const userMsg = {role:"user",text};
-    setMessages(p=>[...p,userMsg]);
-    if (hasCrisis(text)){
-      setCrisisMode(true);
-      setMessages(p=>[...p,CRISIS_MSG]);
-      return;
-    }
-    setLoading(true);
-    try {
-      const hist = [...messages,userMsg].filter(m=>m.type!=="crisis").slice(-10)
-        .map(m=>({role:m.role==="bot"?"assistant":"user",content:m.text}));
-      const res = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",max_tokens:800,
-          system:`You are a warm, empathetic peer-support companion on "The Safe Space Blog." Listen actively, validate feelings, help users reflect on everyday stressors (school, work, relationships, loneliness, burnout). Suggest practical coping strategies from the site (box breathing, journaling, grounding) when natural. Keep responses warm and conversational — 3 to 5 sentences. You are NOT a therapist; never diagnose or prescribe. If someone seems persistently distressed, gently mention 988.`,
-          messages:hist,
-        }),
-      });
-      const data = await res.json();
-      const reply = data.content?.[0]?.text || "I'm here with you. Can you tell me more about what you're going through?";
-      setMessages(p=>[...p,{role:"bot",text:reply}]);
-    } catch {
-      setMessages(p=>[...p,{role:"bot",text:"I'm having a little trouble connecting. If you need immediate support, please call or text 988."}]);
-    } finally { setLoading(false); }
-  }
-
-  if (!agreed) return (
-    <div style={{minHeight:"72vh",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-      <div className="card" style={{maxWidth:500,width:"100%",padding:"2.5rem",textAlign:"center"}}>
-        <Logo size={64} />
-        <h2 className="serif" style={{fontSize:26,marginTop:16,marginBottom:12}}>Before we begin</h2>
-        <p style={{fontSize:15,lineHeight:1.75,color:C.mid,marginBottom:16}}>
-          This is an AI-powered peer-support space. It's here to listen and help you reflect — <strong>it is not a therapist</strong> and does not provide medical or psychological treatment.
-        </p>
-        <div style={{background:C.crisisBg,border:`1.5px solid rgba(155,34,34,0.2)`,borderRadius:12,padding:"12px 16px",marginBottom:24,fontSize:14,color:C.crisis,lineHeight:1.7,textAlign:"left"}}>
-          🚨 If you are in crisis right now, please <strong>call or text 988</strong> immediately — it's free, confidential, and available 24/7.
-        </div>
-        <button className="btn-primary" style={{width:"100%",padding:"13px",fontSize:15}} onClick={()=>setAgreed(true)}>
-          I understand — let's talk
-        </button>
-      </div>
-    </div>
-  );
-
+  const [feeling, setFeeling] = useState(null);
+  const f = FEELINGS.find(x=>x.id===feeling);
   return (
-    <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 112px)"}}>
-      {crisisMode && (
-        <div style={{background:C.crisisBg,borderBottom:`2px solid rgba(155,34,34,0.25)`,padding:"10px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
-          <p style={{fontSize:14,color:C.crisis,fontWeight:600}}>🚨 Real support is available right now</p>
-          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <a href="tel:988"><button className="btn-danger">📞 Call/Text 988</button></a>
-            <a href="sms:741741?body=HOME"><button className="btn-warn">📱 Text HOME to 741741</button></a>
-            <a href="https://findahelpline.com" target="_blank"><button className="btn-ghost" style={{fontSize:13,color:C.blue600,borderRadius:20}}>🌐 International Help</button></a>
-          </div>
+    <div style={{maxWidth:760,margin:"0 auto",padding:"3rem 20px"}}>
+      <div style={{textAlign:"center",marginBottom:28}}>
+        <Logo size={60}/>
+        <h1 className="serif" style={{fontSize:"clamp(26px,4vw,36px)",marginTop:14,marginBottom:10}}>Talk to Someone</h1>
+        <p style={{fontSize:16,color:C.mid,lineHeight:1.7}}>Whatever you're feeling, you don't have to handle it alone. Pick what fits right now and we'll point you to something that can help.</p>
+      </div>
+
+      <div className="msg-crisis-card" style={{marginBottom:28}}>
+        <p style={{fontWeight:700,color:C.crisis,marginBottom:8,fontSize:15}}>🚨 Talk to a real person right now: free, confidential, 24/7</p>
+        <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+          <a href="tel:988"><button className="btn-danger">📞 Call 988</button></a>
+          <a href="sms:988"><button className="btn-danger">💬 Text 988</button></a>
+          <a href="sms:741741?body=HOME"><button className="btn-warn">📱 Text HOME to 741741</button></a>
+          <a href="https://findahelpline.com" target="_blank" rel="noreferrer"><button className="btn-ghost" style={{fontSize:13,color:C.blue600,borderRadius:20}}>🌐 Outside the US</button></a>
+        </div>
+        <p style={{fontSize:13,color:C.mid,marginTop:10}}>In an emergency, call 911 or go to your nearest emergency room.</p>
+      </div>
+
+      <p className="section-label" style={{marginBottom:12}}>How are you feeling?</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:10,marginBottom:24}}>
+        {FEELINGS.map(x=>(
+          <button key={x.id} className={`btn-ghost ${feeling===x.id?"active":""}`} onClick={()=>setFeeling(x.id)}
+            aria-pressed={feeling===x.id}
+            style={{textAlign:"left",padding:"14px 16px",borderRadius:14,fontSize:15,background:feeling===x.id?C.teal50:"#fff",borderColor:feeling===x.id?C.teal400:C.border,color:C.charcoal}}>
+            {x.emoji} {x.label}
+          </button>
+        ))}
+      </div>
+
+      {f && (
+        <div className="card" data-testid="feeling-response">
+          <p style={{fontSize:16,lineHeight:1.75,marginBottom:16}}>{f.message}</p>
+          {f.tool && (<>
+            <p style={{fontWeight:700,fontSize:15,marginBottom:8}}>Try this now: {f.tool.name}</p>
+            <ol style={{paddingLeft:22,marginBottom:16,lineHeight:1.8,fontSize:15}}>{f.tool.steps.map((s,i)=><li key={i}>{s}</li>)}</ol>
+          </>)}
+          <p style={{fontSize:15,lineHeight:1.7,color:C.mid}}>{f.next}</p>
         </div>
       )}
-      <div style={{flex:1,overflowY:"auto",padding:"20px",display:"flex",flexDirection:"column",scrollbarWidth:"thin"}}>
-        <div style={{maxWidth:700,width:"100%",margin:"0 auto",display:"flex",flexDirection:"column",gap:14}}>
-          {messages.map((m,i)=>(
-            m.type==="crisis" ? (
-              <div key={i} className="msg-crisis-card">
-                <p style={{fontWeight:700,color:C.crisis,marginBottom:10,fontSize:15}}>🚨 Support is available right now</p>
-                <p style={{whiteSpace:"pre-line",marginBottom:14}}>{m.text}</p>
-                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                  <a href="tel:988"><button className="btn-danger">📞 Call or Text 988</button></a>
-                  <a href="sms:741741?body=HOME"><button className="btn-warn">📱 Text HOME to 741741</button></a>
-                  <a href="https://findahelpline.com" target="_blank"><button className="btn-ghost" style={{fontSize:13,color:C.blue600,borderRadius:20}}>🌐 findahelpline.com</button></a>
-                </div>
-              </div>
-            ) : (
-              <div key={i} className={m.role==="user"?"msg-user":"msg-bot"} style={{alignSelf:m.role==="user"?"flex-end":"flex-start"}}>{m.text}</div>
-            )
-          ))}
-          {loading && <div className="msg-bot" style={{alignSelf:"flex-start",opacity:0.6,fontStyle:"italic"}}>Thinking…</div>}
-          <div ref={bottomRef}/>
-        </div>
-      </div>
-      <div style={{borderTop:`1px solid ${C.border}`,padding:"14px 20px",background:"#fff"}}>
-        <div style={{maxWidth:700,margin:"0 auto",display:"flex",gap:10,alignItems:"flex-end"}}>
-          <textarea className="chat-input-page" placeholder="Share what's on your mind…" value={input} rows={1}
-            onChange={e=>setInput(e.target.value)}
-            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}}/>
-          <button className="btn-primary" onClick={send} disabled={!input.trim()||loading} style={{padding:"10px 22px",borderRadius:16,flexShrink:0}}>Send →</button>
-        </div>
-        <p style={{maxWidth:700,margin:"8px auto 0",fontSize:11,color:C.muted,textAlign:"center"}}>Not a therapist · AI peer support only · In crisis? Call/text 988</p>
-      </div>
+
+      <p style={{fontSize:12,color:C.muted,textAlign:"center",marginTop:28}}>The Safe Space Blog is peer support, not a substitute for professional care.</p>
     </div>
   );
 }
+
+const TALK_NEXT = "Talking to someone you trust, like a friend, parent, school counselor, coach or doctor, can make a real difference. If it ever feels like too much, call or text 988.";
+const FEELINGS = [
+  { id:"crisis", emoji:"🆘", label:"I'm not safe / thinking about hurting myself",
+    message:"Thank you for telling us. You deserve support right now, and you don't have to get through this alone. Please call or text 988 now. A trained counselor will listen, and it's free and confidential. If you're in immediate danger, call 911.",
+    next:"If you can, also let someone near you know how you're feeling, and stay with someone you trust." },
+  { id:"anxious", emoji:"😰", label:"Anxious or panicky",
+    message:"Anxiety can make your body feel like it's in an emergency, even when you're safe. That feeling is uncomfortable, but it does pass.",
+    tool:{ name:"Box breathing", steps:["Breathe in slowly for a count of 4.","Hold gently for 4.","Breathe out slowly for 4.","Hold for 4, then repeat 4 to 6 times."] }, next:TALK_NEXT },
+  { id:"stressed", emoji:"😣", label:"Stressed or overwhelmed",
+    message:"When everything piles up, it can feel impossible to know where to start. You don't have to fix it all at once.",
+    tool:{ name:"Brain dump", steps:["Write down everything on your mind, without sorting it.","Circle the one thing that matters most today.","Write one small first step for it.","Let the rest wait until tomorrow."] }, next:TALK_NEXT },
+  { id:"sad", emoji:"😔", label:"Sad or low",
+    message:"Feeling low is hard, and it's okay to not be okay. Being gentle with yourself right now matters.",
+    tool:{ name:"One small kind thing", steps:["Drink a glass of water or eat something small.","Step outside or open a window for a few minutes.","Message one person, even just to say hi.","Do one thing that usually comforts you, like music or a shower."] }, next:"If you've felt low for more than a couple of weeks, please talk to a trusted adult, school counselor or doctor. You can call or text 988 anytime." },
+  { id:"lonely", emoji:"🫥", label:"Lonely",
+    message:"Loneliness is really common, even when you're surrounded by people. It doesn't mean something is wrong with you.",
+    tool:{ name:"Reach out, small", steps:["Think of one person you'd like to feel closer to.","Send them something small: a meme, a 'thinking of you', a question.","Look for one club, class or group activity to try this week."] }, next:TALK_NEXT },
+  { id:"angry", emoji:"😤", label:"Angry or frustrated",
+    message:"Anger is a normal feeling. It often shows up when something feels unfair or out of your control.",
+    tool:{ name:"Cool-down reset", steps:["Step away from the situation if you can.","Unclench your jaw and drop your shoulders.","Take 5 slow breaths, making each out-breath longer than the in-breath.","Move your body: a quick walk or stretch."] }, next:TALK_NEXT },
+  { id:"numb", emoji:"😶", label:"Numb or disconnected",
+    message:"Sometimes when things get too much, our minds go a little quiet or far away. Grounding can help you come back to the present.",
+    tool:{ name:"5-4-3-2-1 grounding", steps:["Name 5 things you can see.","4 things you can feel.","3 things you can hear.","2 things you can smell.","1 thing you can taste."] }, next:TALK_NEXT },
+];
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 function AuthView({ users, setUsers, setCurrentUser, setView }){
@@ -563,86 +517,6 @@ function ImageUpload({ value, onChange, label="Add a photo (optional)" }){
   );
 }
 
-// ─── Doc upload + AI analysis ─────────────────────────────────────────────────
-function DocUpload({ onExtracted }){
-  const [status, setStatus] = useState("idle"); // idle|loading|done|error
-  const [result, setResult] = useState(null);
-  const ref = useRef();
-
-  async function handleFile(file){
-    if (!file) return;
-    setStatus("loading"); setResult(null);
-    const name = file.name.toLowerCase();
-    let text = "";
-    try {
-      if (name.endsWith(".txt") || name.endsWith(".md")){
-        text = await file.text();
-      } else {
-        // For .docx / other — read as ArrayBuffer, attempt text extraction heuristically
-        const buf = await file.arrayBuffer();
-        const uint = new Uint8Array(buf);
-        // Pull readable ASCII/unicode text chunks (crude but works for plain-ish docx)
-        let raw = "";
-        for (let i=0;i<uint.length;i++){
-          const c=uint[i];
-          if ((c>=32&&c<127)||c===10||c===13) raw+=String.fromCharCode(c);
-        }
-        // Extract word-like tokens (filter junk bytes)
-        text = raw.split(/\s+/).filter(w=>w.length>2&&/^[a-zA-Z0-9'',.\-!?;:()]+$/.test(w)).join(" ");
-      }
-      if (!text||text.length<80){ setStatus("error"); setResult({msg:"Could not extract enough text from this file. Please try a .txt file or paste your text directly."}); return; }
-
-      // Ask Claude to evaluate and clean
-      const res = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",max_tokens:1200,
-          system:`You are an editorial assistant for a mental wellness peer-support blog. Analyse the submitted article excerpt and respond ONLY with a JSON object (no markdown fences) with these fields:
-{
-  "looks_good": true/false,
-  "feedback": "2-3 sentence editorial assessment — what works, what could improve",
-  "cleaned_title": "suggested article title",
-  "cleaned_body": "the article text, cleaned up for readability (fix obvious typos, normalise spacing), do not alter the author voice"
-}`,
-          messages:[{role:"user",content:`Article text:\n\n${text.slice(0,4000)}`}],
-        }),
-      });
-      const data = await res.json();
-      const raw2 = data.content?.[0]?.text||"{}";
-      let parsed;
-      try { parsed = JSON.parse(raw2); } catch { parsed = {looks_good:false,feedback:"Could not parse AI response.",cleaned_title:"",cleaned_body:text}; }
-      setResult(parsed); setStatus("done");
-    } catch(e){
-      setStatus("error"); setResult({msg:"Something went wrong reading the file."});
-    }
-  }
-
-  return (
-    <div>
-      <label style={{fontSize:13,color:C.mid,display:"block",marginBottom:8,fontWeight:600}}>📄 Upload a document <span style={{fontWeight:400,fontStyle:"italic"}}>(optional — .txt, .md, or .docx)</span></label>
-      <div className="upload-zone" onClick={()=>ref.current.click()} style={{marginBottom:0}}>
-        <p style={{fontSize:22,marginBottom:4}}>📎</p>
-        <p style={{fontSize:14,color:C.mid,fontWeight:500}}>Click to upload a document</p>
-        <p style={{fontSize:12,color:C.muted,marginTop:4}}>.txt · .md · .docx</p>
-        <input ref={ref} type="file" accept=".txt,.md,.docx,text/*" style={{display:"none"}} onChange={e=>handleFile(e.target.files[0])}/>
-      </div>
-      {status==="loading" && <p style={{fontSize:13,color:C.teal600,marginTop:10,fontWeight:500}}>⏳ Analysing your document…</p>}
-      {status==="error" && <p style={{fontSize:13,color:C.coral400,marginTop:10}}>⚠ {result?.msg}</p>}
-      {status==="done" && result && (
-        <div className="doc-analysis">
-          <p style={{fontWeight:700,fontSize:14,marginBottom:6,color:result.looks_good?C.teal700:C.amber600}}>
-            {result.looks_good ? "✅ Looks good!" : "✏ A few things to note"}
-          </p>
-          <p style={{fontSize:13,color:C.mid,lineHeight:1.65,marginBottom:12}}>{result.feedback}</p>
-          <button className="btn-primary" style={{fontSize:13,padding:"8px 18px"}} onClick={()=>onExtracted(result.cleaned_title||"",result.cleaned_body||"")}>
-            Use this text in the form →
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Contributor dashboard ────────────────────────────────────────────────────
 function DashboardView({ currentUser, articles, setArticles }){
   const [form, setForm] = useState({title:"",category:"reality-check",body:"",imageDataUrl:null});
@@ -695,7 +569,6 @@ function DashboardView({ currentUser, articles, setArticles }){
         <div className="card" style={{marginBottom:36}}>
           <h2 style={{fontSize:18,fontWeight:700,marginBottom:20}}>Submit a Story or Essay</h2>
           <div style={{display:"flex",flexDirection:"column",gap:16}}>
-            <DocUpload onExtracted={(title,body)=>setForm(f=>({...f,title:title||f.title,body:body||f.body}))}/>
             <div><label style={{fontSize:13,color:C.mid,display:"block",marginBottom:6,fontWeight:600}}>Title</label>
               <input className="input-field" placeholder="Your story title…" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))}/></div>
             <div><label style={{fontSize:13,color:C.mid,display:"block",marginBottom:6,fontWeight:600}}>Category</label>
