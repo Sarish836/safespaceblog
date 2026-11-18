@@ -320,18 +320,39 @@ function byNewest(a, b){
   return String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")) || Number(b.id) - Number(a.id);
 }
 const ROUTES = ["home","reality-check","mind-mechanics","toolkit","talk","auth","dashboard","admin"];
+// Real addresses (/article/12, /toolkit) so search engines can list every
+// page. Old links like /#/article/12 are converted on load.
 function parseHash(){
-  const h = (window.location.hash || "").replace(/^#\/?/, "");
-  const [a, b] = h.split("/");
+  const legacy = (window.location.hash || "").match(/^#\/(.*)$/);
+  if (legacy) window.history.replaceState(null, "", "/" + legacy[1]);
+  const p = window.location.pathname.replace(/^\/+|\/+$/g, "");
+  const [a, b] = p.split("/");
   if (a === "article" && b) return { view:"article", id:decodeURIComponent(b) };
   const v = a === "" ? "home" : a === "sign-in" ? "auth" : a;
   return { view: ROUTES.includes(v) ? v : "home", id:null };
 }
 function toHash(v, id){
-  if (v === "article") return "#/article/" + encodeURIComponent(id);
-  if (v === "home") return "#/";
-  if (v === "auth") return "#/sign-in";
-  return "#/" + v;
+  if (v === "article") return "/article/" + encodeURIComponent(id);
+  if (v === "home") return "/";
+  if (v === "auth") return "/sign-in";
+  return "/" + v;
+}
+const SITE_URL = "https://safespaceblog.vercel.app";
+function setHead({ title, desc, path, noindex }){
+  document.title = title;
+  const meta = (attr, key, val) => {
+    let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+    if (!el) { el = document.createElement("meta"); el.setAttribute(attr, key); document.head.appendChild(el); }
+    el.setAttribute("content", val);
+  };
+  meta("name", "description", desc);
+  meta("property", "og:title", title);
+  meta("property", "og:description", desc);
+  meta("property", "og:url", SITE_URL + path);
+  meta("name", "robots", noindex ? "noindex" : "index,follow");
+  let link = document.head.querySelector('link[rel="canonical"]');
+  if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
+  link.href = SITE_URL + path;
 }
 // Makes a non-button element behave like a link for keyboard users too.
 function linkProps(fn, label){
@@ -1487,15 +1508,18 @@ export default function App(){
   // The address bar is the source of truth, so links can be shared and the
   // browser's back button works. Access rules are checked when rendering.
   useEffect(() => {
-    const onHash = () => { setRoute(parseHash()); setSearchOpen(false); window.scrollTo(0, 0); };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const onPop = () => { setRoute(parseHash()); setSearchOpen(false); };
+    window.addEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onPop);
+    return () => { window.removeEventListener("popstate", onPop); window.removeEventListener("hashchange", onPop); };
   }, []);
 
   function go(v, id){
     const h = toHash(v, id);
-    if (window.location.hash === h) { window.scrollTo(0, 0); return; }
-    window.location.hash = h;
+    setSearchOpen(false);
+    if (window.location.pathname !== h) window.history.pushState(null, "", h);
+    setRoute(parseHash());
+    window.scrollTo(0, 0);
   }
   const openArticle = a => go("article", a.id);
 
@@ -1517,12 +1541,18 @@ export default function App(){
   useEffect(() => {
     const base = "The Safe Space Blog";
     const cat = CATS.find(c=>c.id===view);
-    document.title =
-      current ? `${current.title} · ${base}` :
-      cat ? `${cat.label} · ${base}` :
-      view==="talk" ? `Talk to someone · ${base}` :
-      view==="auth" ? `Sign in · ${base}` :
-      `${base} · Stories, explainers and coping tools`;
+    const SECTION_DESC = {
+      "reality-check":"Real stories from people your age about what anxiety, stress, loneliness and hard days actually felt like.",
+      "mind-mechanics":"What's going on in your brain and body when you feel anxious, low or overwhelmed, explained without the jargon.",
+      "toolkit":"Small, specific coping tools to try when a day gets heavy: breathing, grounding, sleep, worry and more.",
+    };
+    const HOME_DESC = "Honest stories from people your age, plain-language explainers about how your mind works, and small coping tools to try when a day gets heavy. Free to read, and help is always one tap away.";
+    if (current) setHead({ title:`${current.title} · ${base}`, desc:excerpt(current.body, 155), path:`/article/${encodeURIComponent(current.id)}` });
+    else if (view==="article") setHead({ title:`Story not found · ${base}`, desc:HOME_DESC, path:"/", noindex:true });
+    else if (cat) setHead({ title:`${cat.label} · ${base}`, desc:SECTION_DESC[cat.id], path:`/${cat.id}` });
+    else if (view==="talk") setHead({ title:`Talk to someone · ${base}`, desc:"Free, confidential help 24/7. Call or text 988, or text HOME to 741741.", path:"/talk" });
+    else if (view==="auth"||view==="dashboard"||view==="admin") setHead({ title:`${view==="admin"?"Admin":view==="dashboard"?"My posts":"Sign in"} · ${base}`, desc:HOME_DESC, path:"/sign-in", noindex:true });
+    else setHead({ title:`${base} · Mental health stories, explainers and coping tools for teens`, desc:HOME_DESC, path:"/" });
   }, [view, current]);
 
   return (

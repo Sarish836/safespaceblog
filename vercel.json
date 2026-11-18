@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/article/:id", "destination": "/api/page?id=:id" },
+    { "source": "/:page(reality-check|mind-mechanics|toolkit|talk)", "destination": "/api/page?page=:page" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "functions": {
+    "api/page.js": { "includeFiles": "build/index.html" }
+  }
+}
