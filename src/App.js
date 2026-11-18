@@ -177,6 +177,49 @@ a{color:inherit;text-decoration:none;}
 
 .write-band{background:${K.ink};color:#fff;border-radius:28px;padding:48px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
 
+/* uniform covers */
+.story .cover,.lead .cover{position:relative;isolation:isolate;}
+.duo{position:relative;width:100%;height:100%;overflow:hidden;}
+.duo img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) contrast(1.12) brightness(1.04);mix-blend-mode:multiply;}
+.duo-ink{position:absolute;inset:0;mix-blend-mode:lighten;pointer-events:none;}
+.story:hover .duo img,.lead:hover .duo img{transform:scale(1.04);}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:multiply;z-index:2;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");}
+.hero .grain{opacity:.14;mix-blend-mode:overlay;}
+
+/* scroll reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1);}
+.reveal.in{opacity:1;transform:none;}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+
+/* hero motion */
+.sun{transform-origin:330px 190px;animation:breathe 9s ease-in-out infinite;}
+.ring{transform-origin:330px 190px;animation:ring 9s ease-in-out infinite;}
+.ring.r2{animation-delay:1.2s}
+.hill{animation:drift 14s ease-in-out infinite alternate;}
+.hill.h2{animation-duration:18s}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes ring{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.5;transform:scale(1.05)}}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-18px)}}
+@media (prefers-reduced-motion:reduce){.sun,.ring,.hill{animation:none}}
+
+.dateline{font-size:14px;font-weight:600;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.dateline::before{content:'';width:8px;height:8px;border-radius:50%;background:${K.sun};box-shadow:0 0 0 4px rgba(244,185,66,.2);}
+
+.promises{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid ${K.line};}
+.promises div{padding:22px 24px 22px 0;font-size:15px;line-height:1.5;color:${K.ink};}
+.promises div + div{padding-left:24px;border-left:1px solid ${K.line};}
+.promises strong{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.01em;margin-bottom:2px;}
+
+.pull{padding:96px 0 24px;text-align:center;}
+.pull blockquote{font-family:'Newsreader',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(30px,4.2vw,54px);line-height:1.18;letter-spacing:-0.015em;max-width:940px;margin:0 auto;color:${K.ink};}
+.pull blockquote::before{content:'\\201C';display:block;font-family:'Bricolage Grotesque',sans-serif;font-style:normal;font-weight:800;font-size:120px;line-height:.6;color:${K.sun};margin-bottom:12px;}
+.pull cite{display:block;font-style:normal;font-size:15px;color:${C.mid};margin-top:26px;}
+.pull cite button{background:none;border:none;font:inherit;color:${K.ink};font-weight:600;text-decoration:underline;text-underline-offset:4px;}
+
+.progress{position:fixed;top:0;left:0;height:4px;background:${K.sun};z-index:1100;transition:width .1s linear;}
+.banner{position:relative;isolation:isolate;aspect-ratio:21/9;overflow:hidden;}
+
 /* reader */
 .reader{font-family:'Newsreader',Georgia,serif;font-size:21px;line-height:1.7;color:${K.ink};}
 .reader p{margin-bottom:1.1em;}
@@ -192,6 +235,8 @@ a{color:inherit;text-decoration:none;}
 @media (prefers-reduced-motion:reduce){.rise{animation:none}*{transition:none!important}}
 
 @media(max-width:900px){
+  .promises{grid-template-columns:1fr;}
+  .promises div,.promises div + div{padding:16px 0;border-left:none;border-top:1px solid ${K.line};}
   .hero-grid{grid-template-columns:1fr;min-height:0;padding-top:56px;}
   .grid-3{grid-template-columns:1fr 1fr;}
   .lead{grid-template-columns:1fr;gap:24px;}
@@ -239,10 +284,25 @@ function seeded(str){
 
 // Generated cover art so every post has a picture, even without an upload.
 // Each post gets its own arrangement of sun, hills and dots from its title.
+function Grain(){ return <span className="grain" aria-hidden="true"/>; }
+
+// Every post gets the same kind of cover. Uploaded photos are turned into a
+// two-tone print in the section's colours so they sit alongside the
+// illustrated covers instead of standing out.
 function Cover({ article }){
-  if (article.imageDataUrl) return <img src={article.imageDataUrl} alt=""/>;
   const st = CAT_STYLE[article.category] || CAT_STYLE["reality-check"];
   const [bg, main, sun, deep] = st.art;
+  if (article.imageDataUrl) return (
+    <div className="duo" style={{background:bg}}>
+      <img src={article.imageDataUrl} alt=""/>
+      <span className="duo-ink" style={{background:deep}}/>
+    </div>
+  );
+  return <CoverArt article={article} colors={[bg, main, sun, deep]}/>;
+}
+
+function CoverArt({ article, colors }){
+  const [bg, main, sun, deep] = colors;
   const r = seeded(String(article.id) + article.title);
   const sx = 80 + r()*240, sy = 70 + r()*70, sr = 34 + r()*36;
   const h1 = 170 + r()*40, h2 = 200 + r()*40;
@@ -261,15 +321,16 @@ function Cover({ article }){
   );
 }
 
+
 function HeroArt(){
   return (
     <svg className="hero-art" viewBox="0 0 560 480" aria-hidden="true">
-      <circle cx="330" cy="190" r="118" fill={K.sun}/>
-      <circle cx="330" cy="190" r="160" fill="none" stroke={K.sun} strokeOpacity=".25" strokeWidth="2"/>
-      <circle cx="330" cy="190" r="205" fill="none" stroke={K.sun} strokeOpacity=".12" strokeWidth="2"/>
+      <circle className="sun" cx="330" cy="190" r="118" fill={K.sun}/>
+      <circle className="ring" cx="330" cy="190" r="160" fill="none" stroke={K.sun} strokeWidth="2"/>
+      <circle className="ring r2" cx="330" cy="190" r="205" fill="none" stroke={K.sun} strokeOpacity=".5" strokeWidth="2"/>
       {[[70,70],[120,140],[470,60],[520,150],[40,200],[200,40],[430,250]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r={i%2?2:3} fill="#fff" opacity=".55"/>)}
-      <path d="M0 330 C 110 260, 200 330, 300 290 S 480 250, 560 280 V480 H0 Z" fill="#2E6A55"/>
-      <path d="M0 380 C 140 330, 260 400, 380 350 S 520 340, 560 330 V480 H0 Z" fill="#4E9A68"/>
+      <path className="hill" d="M0 330 C 110 260, 200 330, 300 290 S 480 250, 600 280 V480 H0 Z" fill="#2E6A55"/>
+      <path className="hill h2" d="M0 380 C 140 330, 260 400, 380 350 S 520 340, 600 330 V480 H0 Z" fill="#4E9A68"/>
       <path d="M0 430 C 160 400, 300 450, 560 400 V480 H0 Z" fill={K.forestDeep}/>
     </svg>
   );
@@ -370,7 +431,7 @@ function StoryCard({ article, onClick, showCat=true }){
   const st = CAT_STYLE[article.category];
   return (
     <article className="story" onClick={()=>onClick(article)}>
-      <div className="cover"><Cover article={article}/></div>
+      <div className="cover"><Cover article={article}/><Grain/></div>
       {showCat && cat && <span className="cat-tag" style={{color:st?.deep}}>{cat.label.replace(/^The /,"")}</span>}
       <h3>{article.title}</h3>
       <p>{excerpt(article.body)}</p>
@@ -388,6 +449,12 @@ function ArticleModal({ article, onClose }){
   const cat = CATS.find(c=>c.id===article.category);
   const st = CAT_STYLE[article.category];
   const paras = article.body.split("\n").filter(Boolean);
+  const [pct, setPct] = useState(0);
+  function onScroll(e){
+    const el = e.currentTarget;
+    const max = el.scrollHeight - el.clientHeight;
+    setPct(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 100);
+  }
   useEffect(()=>{
     const onKey = e => { if (e.key==="Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -396,7 +463,8 @@ function ArticleModal({ article, onClose }){
     return ()=>{ window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
   }, [onClose]);
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} onScroll={onScroll}>
+      <div className="progress" style={{width:pct+"%"}} aria-hidden="true"/>
       <article style={{background:K.paper,borderRadius:28,overflow:"hidden",maxWidth:820,width:"94%",margin:"auto"}} onClick={e=>e.stopPropagation()}>
         <div style={{background:st?.bg||"#eee",padding:"28px clamp(22px,6vw,64px) 36px",position:"relative"}}>
           <button onClick={onClose} aria-label="Close article" style={{position:"absolute",top:20,right:20,width:40,height:40,borderRadius:"50%",border:"none",background:"rgba(255,255,255,.7)",fontSize:18,fontWeight:700,color:K.ink}}>✕</button>
@@ -404,15 +472,13 @@ function ArticleModal({ article, onClose }){
           <h2 className="display" style={{fontSize:"clamp(30px,4.6vw,50px)",lineHeight:1.02,fontWeight:800,letterSpacing:"-0.04em",margin:"12px 0 16px",maxWidth:640}}>{article.title}</h2>
           <p style={{fontSize:15,color:C.mid}}>By {article.authorName} · {prettyDate(article.submittedAt)} · {readMins(article.body)} min read</p>
         </div>
+        {!article.videoUrl && <div className="banner"><Cover article={article}/><Grain/></div>}
         <div style={{padding:"36px clamp(22px,6vw,64px) 48px"}}>
           {article.videoUrl && (
             <div style={{marginBottom:28}}>
               <div className="video-wrap"><iframe src={article.videoUrl} title={article.videoCaption||"Video"} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowFullScreen/></div>
               {article.videoCaption && <p style={{fontSize:13,color:C.muted,marginTop:6}}>{article.videoCaption}</p>}
             </div>
-          )}
-          {!article.videoUrl && article.imageDataUrl && (
-            <img src={article.imageDataUrl} alt="" style={{width:"100%",borderRadius:16,objectFit:"cover",maxHeight:400,marginBottom:32}}/>
           )}
           <div className="reader">{paras.map((p,i)=><p key={i}>{p}</p>)}</div>
           <div style={{marginTop:32,background:"#F1EDE4",borderRadius:16,padding:"18px 20px",fontSize:15,color:K.ink}}>
@@ -424,16 +490,44 @@ function ArticleModal({ article, onClose }){
   );
 }
 
+function useReveal(dep){
+  useEffect(()=>{
+    const els = document.querySelectorAll(".reveal:not(.in)");
+    if (!("IntersectionObserver" in window)) { els.forEach(e=>e.classList.add("in")); return; }
+    const io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{ if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { rootMargin:"0px 0px -8% 0px", threshold:0.08 });
+    els.forEach(e=>io.observe(e));
+    return () => io.disconnect();
+  }, [dep]);
+}
+
+// Picks a real line from a reader's story to feature as a quote.
+function pickQuote(articles){
+  for (const a of articles){
+    if (a.category!=="reality-check") continue;
+    const sentences = String(a.body||"").replace(/\s+/g," ").match(/[^.!?]+[.!?]/g) || [];
+    const line = sentences.map(x=>x.trim()).find(x=>x.length>=50 && x.length<=170 && !/AI assistance/i.test(x));
+    if (line) return { line, article:a };
+  }
+  return null;
+}
+
 // ─── Home ─────────────────────────────────────────────────────────────────────
 function HomeView({ articles, setView, onRead }){
   const approved = articles.filter(a => a?.isApproved).sort(byNewest);
   const lead = approved[0];
   const leadCat = lead && CATS.find(c=>c.id===lead.category);
+  const quote = pickQuote(approved.filter(a=>a!==lead)) || pickQuote(approved);
+  useReveal(approved.length);
+  const today = new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
   return (
     <div>
       <section className="hero">
-        <div className="wrap hero-grid">
+        <Grain/>
+        <div className="wrap hero-grid" style={{position:"relative",zIndex:3}}>
           <div style={{padding:"72px 0"}}>
+            <p className="dateline rise">{today}</p>
             <h1 className="rise">You don't have to carry it <em>alone.</em></h1>
             <p className="rise d1">Honest stories, plain-language explainers about how your mind works, and small things you can try when a day gets heavy.</p>
             <div className="rise d2" style={{display:"flex",gap:12,marginTop:32,flexWrap:"wrap"}}>
@@ -444,6 +538,14 @@ function HomeView({ articles, setView, onRead }){
           <HeroArt/>
         </div>
       </section>
+
+      <div className="wrap">
+        <div className="promises">
+          <div><strong>Read by a real person</strong>Every post is reviewed before it goes live.</div>
+          <div><strong>Free to read</strong>No account needed. Just pick a story.</div>
+          <div><strong>Help is one tap away</strong>988 is linked on every page, always.</div>
+        </div>
+      </div>
 
       <div className="wrap" style={{paddingTop:28}}>
         <div className="chips">
@@ -457,8 +559,8 @@ function HomeView({ articles, setView, onRead }){
       {lead && (
         <section id="latest" className="wrap" style={{paddingTop:"4rem"}}>
           <p className="section-label" style={{marginBottom:18}}>Just published</p>
-          <article className="lead" onClick={()=>onRead(lead)}>
-            <div className="cover"><Cover article={lead}/></div>
+          <article className="lead reveal" onClick={()=>onRead(lead)}>
+            <div className="cover"><Cover article={lead}/><Grain/></div>
             <div>
               {leadCat && <span style={{fontSize:14,fontWeight:700,color:CAT_STYLE[lead.category]?.deep}}>{leadCat.label}</span>}
               <h2>{lead.title}</h2>
@@ -466,6 +568,13 @@ function HomeView({ articles, setView, onRead }){
               <p className="meta" style={{marginTop:18}}>{lead.authorName} · {prettyDate(lead.submittedAt)} · {readMins(lead.body)} min read</p>
             </div>
           </article>
+        </section>
+      )}
+
+      {quote && (
+        <section className="wrap pull reveal">
+          <blockquote>{quote.line}</blockquote>
+          <cite>From <button onClick={()=>onRead(quote.article)}>{quote.article.title}</button> by {quote.article.authorName}</cite>
         </section>
       )}
 
@@ -477,7 +586,7 @@ function HomeView({ articles, setView, onRead }){
         return (
           <React.Fragment key={cat.id}>
             <section className="wrap" style={{paddingTop:"4.5rem"}}>
-              <div className="cat-band" style={{background:st.bg}}>
+              <div className="cat-band reveal" style={{background:st.bg}}>
                 <div className="cat-head">
                   <div>
                     <h2 style={{color:st.deep}}>{cat.label}</h2>
@@ -490,7 +599,7 @@ function HomeView({ articles, setView, onRead }){
             </section>
             {idx===0 && (
               <section className="wrap" style={{paddingTop:"4.5rem"}}>
-                <div className="help-band">
+                <div className="help-band reveal">
                   <div>
                     <h2>Not sure what you're feeling? Start there.</h2>
                     <p style={{fontSize:17,marginTop:14,maxWidth:480,lineHeight:1.6}}>Pick the word that fits closest and we'll suggest one small thing to try right now, plus who you can talk to.</p>
@@ -506,7 +615,7 @@ function HomeView({ articles, setView, onRead }){
       })}
 
       <section className="wrap" style={{paddingTop:"4.5rem"}}>
-        <div className="write-band">
+        <div className="write-band reveal">
           <div>
             <h2 className="display" style={{fontSize:"clamp(28px,3.4vw,42px)",fontWeight:800,lineHeight:1.05}}>Been through something? Write about it.</h2>
             <p style={{fontSize:17,color:"rgba(255,255,255,.7)",marginTop:12,maxWidth:520}}>Every story is read by a real person before it goes up. You can sign it with just your first name.</p>
@@ -524,6 +633,7 @@ function CategoryView({ category, articles, onRead }){
   const cat = CATS.find(c=>c.id===category);
   const st = CAT_STYLE[category];
   const items = articles.filter(a => a?.isApproved && a.category === category).sort(byNewest);
+  useReveal(items.length + category);
   return (
     <div>
       <section style={{background:st.bg}}>
@@ -535,7 +645,7 @@ function CategoryView({ category, articles, onRead }){
       </section>
       <div className="wrap" style={{paddingTop:"3.5rem"}}>
         {!items.length ? <p style={{color:C.muted}}>Nothing here yet. If you've got something to say about this, sign in and send it over.</p> :
-          <div className="grid-3" style={{rowGap:48}}>{items.map(a=><StoryCard key={a.id} article={a} onClick={onRead} showCat={false}/>)}</div>}
+          <div className="grid-3" style={{rowGap:48}}>{items.map(a=><div key={a.id} className="reveal"><StoryCard article={a} onClick={onRead} showCat={false}/></div>)}</div>}
       </div>
     </div>
   );
