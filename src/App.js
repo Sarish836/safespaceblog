@@ -211,7 +211,7 @@ a{color:inherit;text-decoration:none;}
 .promises div + div{padding-left:24px;border-left:1px solid ${K.line};}
 .promises strong{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.01em;margin-bottom:2px;}
 
-.pull{padding:96px 0 24px;text-align:center;}
+.pull{padding-top:96px;padding-bottom:24px;text-align:center;}
 .pull blockquote{font-family:'Newsreader',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(30px,4.2vw,54px);line-height:1.18;letter-spacing:-0.015em;max-width:940px;margin:0 auto;color:${K.ink};}
 .pull blockquote::before{content:'\\201C';display:block;font-family:'Bricolage Grotesque',sans-serif;font-style:normal;font-weight:800;font-size:120px;line-height:.6;color:${K.sun};margin-bottom:12px;}
 .pull cite{display:block;font-style:normal;font-size:15px;color:${C.mid};margin-top:26px;}
@@ -219,6 +219,41 @@ a{color:inherit;text-decoration:none;}
 
 .progress{position:fixed;top:0;left:0;height:4px;background:${K.sun};z-index:1100;transition:width .1s linear;}
 .banner{position:relative;isolation:isolate;aspect-ratio:21/9;overflow:hidden;}
+
+.skip{position:absolute;left:-9999px;top:8px;z-index:2000;background:${K.ink};color:#fff;padding:10px 16px;border-radius:999px;font-weight:600;}
+.skip:focus{left:12px;}
+.page-in{animation:pagein .45s cubic-bezier(.2,.7,.2,1) both;}
+@keyframes pagein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.page-in{animation:none}}
+h1,h2,h3,blockquote{text-wrap:balance;}
+p{text-wrap:pretty;}
+.story:focus-visible,.lead:focus-visible{outline:3px solid ${K.sun};outline-offset:6px;border-radius:18px;}
+
+.icon-btn{width:40px;height:40px;border-radius:50%;border:none;background:rgba(20,32,27,.06);display:inline-flex;align-items:center;justify-content:center;color:${K.ink};transition:background .15s;}
+.icon-btn:hover{background:rgba(20,32,27,.12);}
+.kbd{font-size:11px;font-weight:600;border:1px solid ${K.line};border-radius:6px;padding:1px 6px;color:${C.mid};background:#fff;}
+
+.search-wrap{position:fixed;inset:0;z-index:1200;background:rgba(14,38,31,.55);backdrop-filter:blur(6px);display:flex;justify-content:center;align-items:flex-start;padding:10vh 16px 16px;}
+.search-box{width:100%;max-width:680px;background:${K.paper};border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:pagein .25s ease both;}
+.search-box input{width:100%;border:none;outline:none;background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:600;letter-spacing:-0.02em;padding:22px 24px;color:${K.ink};}
+.search-results{max-height:56vh;overflow-y:auto;border-top:1px solid ${K.line};}
+.search-item{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;padding:12px 24px;cursor:pointer;width:100%;text-align:left;background:none;border:none;}
+.search-item:hover,.search-item.on{background:#F1EDE4;}
+.search-item .thumb{width:64px;height:48px;border-radius:10px;overflow:hidden;position:relative;}
+.search-item .thumb svg,.search-item .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+
+.art-hero{padding-top:56px;padding-bottom:48px;}
+.crumb{background:none;border:none;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:8px;}
+.crumb:hover{text-decoration:underline;text-underline-offset:4px;}
+.art-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(38px,6vw,78px);line-height:.98;letter-spacing:-0.045em;margin:20px 0 22px;max-width:980px;}
+.byline{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:15px;color:${C.mid};}
+.avatar{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;color:#fff;}
+.art-banner{position:relative;isolation:isolate;border-radius:28px;overflow:hidden;aspect-ratio:21/9;}
+.art-banner svg,.art-banner img{width:100%;height:100%;object-fit:cover;display:block;}
+.art-body{max-width:700px;margin:0 auto;padding-top:56px;}
+.share{background:#fff;border:1.5px solid ${K.line};border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;color:${K.ink};transition:border-color .15s;}
+.share:hover{border-color:${K.ink};}
+@media(max-width:640px){.art-banner{aspect-ratio:4/3;border-radius:20px}.search-box input{font-size:20px}}
 
 /* reader */
 .reader{font-family:'Newsreader',Georgia,serif;font-size:21px;line-height:1.7;color:${K.ink};}
@@ -243,6 +278,14 @@ a{color:inherit;text-decoration:none;}
   .help-band{grid-template-columns:1fr;padding:36px 28px;}
   .cat-band{padding:32px 24px 36px;border-radius:22px;}
   .write-band{padding:36px 28px;}
+}
+@media(max-width:360px){ .site-header .brand{display:none;} }
+@media(max-width:420px){
+  .site-header .wrap{gap:10px!important;}
+  .brand{font-size:15.5px!important;letter-spacing:-0.02em;}
+  .header-actions{gap:6px!important;}
+  .header-actions .btn-primary{padding:9px 13px!important;font-size:13px!important;}
+  .icon-btn{width:36px;height:36px;}
 }
 @media(max-width:640px){
   .wrap{padding:0 18px;}
@@ -276,6 +319,26 @@ function readMins(body){
 function byNewest(a, b){
   return String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")) || Number(b.id) - Number(a.id);
 }
+const ROUTES = ["home","reality-check","mind-mechanics","toolkit","talk","auth","dashboard","admin"];
+function parseHash(){
+  const h = (window.location.hash || "").replace(/^#\/?/, "");
+  const [a, b] = h.split("/");
+  if (a === "article" && b) return { view:"article", id:decodeURIComponent(b) };
+  const v = a === "" ? "home" : a === "sign-in" ? "auth" : a;
+  return { view: ROUTES.includes(v) ? v : "home", id:null };
+}
+function toHash(v, id){
+  if (v === "article") return "#/article/" + encodeURIComponent(id);
+  if (v === "home") return "#/";
+  if (v === "auth") return "#/sign-in";
+  return "#/" + v;
+}
+// Makes a non-button element behave like a link for keyboard users too.
+function linkProps(fn, label){
+  return { role:"link", tabIndex:0, "aria-label":label, onClick:fn,
+    onKeyDown:e=>{ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); fn(); } } };
+}
+
 function seeded(str){
   let h = 2166136261;
   for (const ch of String(str)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
@@ -345,7 +408,11 @@ function Logo({ size=36 }){
   return <img src={LOGO_SRC} alt="The Safe Space Blog logo" style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0}}/>;
 }
 
-function Header({ view, setView, currentUser, setCurrentUser }){
+function SearchIcon(){
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>;
+}
+
+function Header({ view, setView, currentUser, setCurrentUser, onSearch }){
   const [scrolled, setScrolled] = useState(false);
   useEffect(()=>{
     const on = () => setScrolled(window.scrollY > 8);
@@ -363,6 +430,7 @@ function Header({ view, setView, currentUser, setCurrentUser }){
           {CATS.map(c=><button key={c.id} className={`nav-link ${view===c.id?"active":""}`} onClick={()=>setView(c.id)}>{c.label.replace(/^The /,"")}</button>)}
         </nav>
         <div className="header-actions" style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+          <button className="icon-btn" onClick={onSearch} aria-label="Search stories" title="Search (press /)"><SearchIcon/></button>
           <span className="acct" style={{display:"contents"}}>{currentUser ? (
             <>
               <button className="nav-link" onClick={()=>setView(currentUser.role==="Admin"?"admin":"dashboard")}>{currentUser.role==="Admin" ? "Admin" : "My posts"}</button>
@@ -430,7 +498,7 @@ function StoryCard({ article, onClick, showCat=true }){
   const cat = CATS.find(c=>c.id===article.category);
   const st = CAT_STYLE[article.category];
   return (
-    <article className="story" onClick={()=>onClick(article)}>
+    <article className="story" {...linkProps(()=>onClick(article), article.title)}>
       <div className="cover"><Cover article={article}/><Grain/></div>
       {showCat && cat && <span className="cat-tag" style={{color:st?.deep}}>{cat.label.replace(/^The /,"")}</span>}
       <h3>{article.title}</h3>
@@ -445,47 +513,157 @@ function ArticleCard({ article, onClick }){
   return <StoryCard article={article} onClick={onClick}/>;
 }
 
-function ArticleModal({ article, onClose }){
-  const cat = CATS.find(c=>c.id===article.category);
-  const st = CAT_STYLE[article.category];
-  const paras = article.body.split("\n").filter(Boolean);
+function Avatar({ name, color }){
+  const initial = (String(name||"?").trim()[0] || "?").toUpperCase();
+  return <span className="avatar" style={{background:color}} aria-hidden="true">{initial}</span>;
+}
+
+function ArticlePage({ article, articles, loaded, onRead, setView }){
   const [pct, setPct] = useState(0);
-  function onScroll(e){
-    const el = e.currentTarget;
-    const max = el.scrollHeight - el.clientHeight;
-    setPct(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 100);
-  }
+  const [copied, setCopied] = useState(false);
   useEffect(()=>{
-    const onKey = e => { if (e.key==="Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return ()=>{ window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
-  }, [onClose]);
+    const on = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setPct(max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0);
+    };
+    on(); window.addEventListener("scroll", on, { passive:true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
+
+  if (!article){
+    return (
+      <div className="wrap" style={{padding:"120px 28px",textAlign:"center"}}>
+        {!loaded ? <p style={{color:C.muted}}>Loading story…</p> : (<>
+          <h1 className="display" style={{fontSize:"clamp(32px,5vw,56px)",fontWeight:800,marginBottom:14}}>We couldn't find that story.</h1>
+          <p style={{fontSize:17,color:C.mid,marginBottom:28}}>It may have been moved or taken down.</p>
+          <button className="btn-primary" onClick={()=>setView("home")}>Back to all stories</button>
+        </>)}
+      </div>
+    );
+  }
+
+  const cat = CATS.find(c=>c.id===article.category);
+  const st = CAT_STYLE[article.category] || CAT_STYLE["reality-check"];
+  const paras = article.body.split("\n").filter(Boolean);
+  const approved = articles.filter(a => a?.isApproved && a.id !== article.id).sort(byNewest);
+  const related = [...approved.filter(a=>a.category===article.category), ...approved.filter(a=>a.category!==article.category)].slice(0,3);
+
+  async function share(){
+    const url = window.location.href;
+    try {
+      if (navigator.share) { await navigator.share({ title: article.title, url }); return; }
+      await navigator.clipboard.writeText(url);
+      setCopied(true); setTimeout(()=>setCopied(false), 2000);
+    } catch {}
+  }
+
   return (
-    <div className="modal-overlay" onClick={onClose} onScroll={onScroll}>
+    <article>
       <div className="progress" style={{width:pct+"%"}} aria-hidden="true"/>
-      <article style={{background:K.paper,borderRadius:28,overflow:"hidden",maxWidth:820,width:"94%",margin:"auto"}} onClick={e=>e.stopPropagation()}>
-        <div style={{background:st?.bg||"#eee",padding:"28px clamp(22px,6vw,64px) 36px",position:"relative"}}>
-          <button onClick={onClose} aria-label="Close article" style={{position:"absolute",top:20,right:20,width:40,height:40,borderRadius:"50%",border:"none",background:"rgba(255,255,255,.7)",fontSize:18,fontWeight:700,color:K.ink}}>✕</button>
-          {cat && <span style={{fontSize:14,fontWeight:700,color:st?.deep}}>{cat.label}</span>}
-          <h2 className="display" style={{fontSize:"clamp(30px,4.6vw,50px)",lineHeight:1.02,fontWeight:800,letterSpacing:"-0.04em",margin:"12px 0 16px",maxWidth:640}}>{article.title}</h2>
-          <p style={{fontSize:15,color:C.mid}}>By {article.authorName} · {prettyDate(article.submittedAt)} · {readMins(article.body)} min read</p>
-        </div>
-        {!article.videoUrl && <div className="banner"><Cover article={article}/><Grain/></div>}
-        <div style={{padding:"36px clamp(22px,6vw,64px) 48px"}}>
-          {article.videoUrl && (
-            <div style={{marginBottom:28}}>
-              <div className="video-wrap"><iframe src={article.videoUrl} title={article.videoCaption||"Video"} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowFullScreen/></div>
-              {article.videoCaption && <p style={{fontSize:13,color:C.muted,marginTop:6}}>{article.videoCaption}</p>}
-            </div>
-          )}
-          <div className="reader">{paras.map((p,i)=><p key={i}>{p}</p>)}</div>
-          <div style={{marginTop:32,background:"#F1EDE4",borderRadius:16,padding:"18px 20px",fontSize:15,color:K.ink}}>
-            If any of this hit close to home, you can call or text <a href="tel:988" style={{fontWeight:700,textDecoration:"underline"}}>988</a> any time. You don't need to be in crisis to reach out.
+      <section style={{background:st.bg}}>
+        <div className="wrap art-hero">
+          {cat && <button className="crumb" style={{color:st.deep}} onClick={()=>setView(cat.id)}><span aria-hidden="true">←</span> {cat.label}</button>}
+          <h1 className="art-title rise">{article.title}</h1>
+          <div className="byline rise d1">
+            <Avatar name={article.authorName} color={st.deep}/>
+            <span><strong style={{color:K.ink}}>{article.authorName}</strong><br/>{prettyDate(article.submittedAt)} · {readMins(article.body)} min read</span>
+            <span style={{flex:1}}/>
+            <button className="share" onClick={share}>{copied ? "Link copied" : "Share"}</button>
           </div>
         </div>
-      </article>
+      </section>
+
+      <div style={{background:`linear-gradient(${st.bg} 50%, transparent 50%)`,marginTop:-1}}>
+        <div className="wrap">
+          {article.videoUrl ? (
+            <div style={{maxWidth:980,margin:"0 auto"}}>
+              <div className="video-wrap" style={{borderRadius:24,marginBottom:0}}><iframe src={article.videoUrl} title={article.videoCaption||"Video"} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowFullScreen/></div>
+              {article.videoCaption && <p style={{fontSize:13,color:C.muted,marginTop:8,textAlign:"center"}}>{article.videoCaption}</p>}
+            </div>
+          ) : (
+            <div className="art-banner"><Cover article={article}/><Grain/></div>
+          )}
+        </div>
+      </div>
+
+      <div className="wrap">
+
+        <div className="art-body">
+          <div className="reader">{paras.map((p,i)=><p key={i}>{p}</p>)}</div>
+          <div style={{marginTop:40,background:"#F1EDE4",borderRadius:20,padding:"22px 24px",fontSize:16,lineHeight:1.6}}>
+            <strong style={{display:"block",marginBottom:4}}>If any of this hit close to home</strong>
+            You can call or text <a href="tel:988" style={{fontWeight:700,textDecoration:"underline"}}>988</a> any time. You don't need to be in crisis to reach out.
+          </div>
+          <div style={{display:"flex",gap:10,marginTop:28,flexWrap:"wrap"}}>
+            <button className="share" onClick={share}>{copied ? "Link copied" : "Share this story"}</button>
+            <button className="share" onClick={()=>setView("auth")}>Write your own</button>
+          </div>
+        </div>
+
+        {related.length > 0 && (
+          <section style={{paddingTop:"5rem"}}>
+            <div className="section-head-x" style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",gap:16,marginBottom:28,flexWrap:"wrap"}}>
+              <h2 className="display" style={{fontSize:"clamp(30px,3.6vw,44px)",fontWeight:800,letterSpacing:"-0.035em"}}>Keep reading</h2>
+              {cat && <button className="more" onClick={()=>setView(cat.id)}>More from {cat.label.replace(/^The /,"")}</button>}
+            </div>
+            <div className="grid-3">{related.map(a=><StoryCard key={a.id} article={a} onClick={onRead}/>)}</div>
+          </section>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function SearchOverlay({ articles, onClose, onRead }){
+  const [q, setQ] = useState("");
+  const [sel, setSel] = useState(0);
+  const inputRef = useRef(null);
+  useEffect(()=>{ inputRef.current?.focus(); }, []);
+  useEffect(()=>{
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return ()=>{ document.body.style.overflow = prev; };
+  }, []);
+  const approved = articles.filter(a=>a?.isApproved).sort(byNewest);
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const results = (terms.length
+    ? approved.map(a=>{
+        const t = a.title.toLowerCase(), b = String(a.body||"").toLowerCase();
+        if (!terms.every(w=>t.includes(w)||b.includes(w))) return null;
+        return { a, score: terms.reduce((n,w)=>n+(t.includes(w)?3:0)+(b.includes(w)?1:0),0) };
+      }).filter(Boolean).sort((x,y)=>y.score-x.score).map(x=>x.a)
+    : approved).slice(0,8);
+  useEffect(()=>{ setSel(0); }, [q]);
+  function onKey(e){
+    if (e.key==="Escape") onClose();
+    else if (e.key==="ArrowDown"){ e.preventDefault(); setSel(i=>Math.min(i+1, results.length-1)); }
+    else if (e.key==="ArrowUp"){ e.preventDefault(); setSel(i=>Math.max(i-1, 0)); }
+    else if (e.key==="Enter" && results[sel]) onRead(results[sel]);
+  }
+  return (
+    <div className="search-wrap" onClick={onClose} role="dialog" aria-modal="true" aria-label="Search stories">
+      <div className="search-box" onClick={e=>e.stopPropagation()}>
+        <div style={{display:"flex",alignItems:"center",paddingRight:20}}>
+          <input ref={inputRef} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={onKey} placeholder="Search stories, tools, feelings…" aria-label="Search"/>
+          <span className="kbd">esc</span>
+        </div>
+        <div className="search-results">
+          {!terms.length && <p style={{padding:"14px 24px 4px",fontSize:13,fontWeight:600,color:C.mid}}>Latest</p>}
+          {results.length===0 && <p style={{padding:"22px 24px",color:C.mid}}>No stories match “{q}”. Try a simpler word, like “sleep” or “anxiety”.</p>}
+          {results.map((a,i)=>{
+            const cat = CATS.find(c=>c.id===a.category);
+            return (
+              <button key={a.id} className={`search-item ${i===sel?"on":""}`} onMouseEnter={()=>setSel(i)} onClick={()=>onRead(a)}>
+                <span className="thumb"><Cover article={a}/></span>
+                <span>
+                  <span style={{display:"block",fontSize:12,fontWeight:700,color:CAT_STYLE[a.category]?.deep}}>{cat?.label}</span>
+                  <span style={{display:"block",fontFamily:"'Bricolage Grotesque',sans-serif",fontWeight:700,fontSize:17,letterSpacing:"-0.01em",color:K.ink}}>{a.title}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -559,7 +737,7 @@ function HomeView({ articles, setView, onRead }){
       {lead && (
         <section id="latest" className="wrap" style={{paddingTop:"4rem"}}>
           <p className="section-label" style={{marginBottom:18}}>Just published</p>
-          <article className="lead reveal" onClick={()=>onRead(lead)}>
+          <article className="lead reveal" {...linkProps(()=>onRead(lead), lead.title)}>
             <div className="cover"><Cover article={lead}/><Grain/></div>
             <div>
               {leadCat && <span style={{fontSize:14,fontWeight:700,color:CAT_STYLE[lead.category]?.deep}}>{leadCat.label}</span>}
@@ -644,8 +822,18 @@ function CategoryView({ category, articles, onRead }){
         </div>
       </section>
       <div className="wrap" style={{paddingTop:"3.5rem"}}>
-        {!items.length ? <p style={{color:C.muted}}>Nothing here yet. If you've got something to say about this, sign in and send it over.</p> :
-          <div className="grid-3" style={{rowGap:48}}>{items.map(a=><div key={a.id} className="reveal"><StoryCard article={a} onClick={onRead} showCat={false}/></div>)}</div>}
+        {!items.length ? <p style={{color:C.muted}}>Nothing here yet. If you've got something to say about this, sign in and send it over.</p> : (<>
+          <article className="lead reveal" style={{marginBottom:"4rem"}} {...linkProps(()=>onRead(items[0]), items[0].title)}>
+            <div className="cover"><Cover article={items[0]}/><Grain/></div>
+            <div>
+              <span style={{fontSize:14,fontWeight:700,color:st.deep}}>Newest</span>
+              <h2>{items[0].title}</h2>
+              <p style={{fontSize:18,color:C.mid,lineHeight:1.6}}>{excerpt(items[0].body, 220)}</p>
+              <p className="meta" style={{marginTop:18}}>{items[0].authorName} · {prettyDate(items[0].submittedAt)} · {readMins(items[0].body)} min read</p>
+            </div>
+          </article>
+          <div className="grid-3" style={{rowGap:48}}>{items.slice(1).map(a=><div key={a.id} className="reveal"><StoryCard article={a} onClick={onRead} showCat={false}/></div>)}</div>
+        </>)}
       </div>
     </div>
   );
@@ -1210,8 +1398,10 @@ function NewPostModal({ onSave, onClose }){
 
 // ─── App root ─────────────────────────────────────────────────────────────────
 export default function App(){
-  const [view, setView] = useState("home");
+  const [route, setRoute] = useState(parseHash);
   const [articles, setArticles] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
     useEffect(() => {
     const sortArticles = (items) =>
       [...items]
@@ -1235,7 +1425,7 @@ export default function App(){
       setArticles(sortArticles((data || []).map(row => row.data)));
     }
 
-    load();
+    load().finally(() => setLoaded(true));
 
     const channel = supabase
       .channel('articles-live-updates')
@@ -1293,30 +1483,66 @@ export default function App(){
     try { localStorage.setItem("sss_users", JSON.stringify(users)); } catch {}
   }, [users]);
   const [currentUser, setCurrentUser] = useState(null);
-  const [readArticle, setReadArticle] = useState(null);
 
-  function safeSetView(v){
-    if (v==="dashboard"&&!currentUser){setView("auth");return;}
-    if (v==="admin"&&currentUser?.role!=="Admin"){setView("home");return;}
-    setView(v);
+  // The address bar is the source of truth, so links can be shared and the
+  // browser's back button works. Access rules are checked when rendering.
+  useEffect(() => {
+    const onHash = () => { setRoute(parseHash()); setSearchOpen(false); window.scrollTo(0, 0); };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  function go(v, id){
+    const h = toHash(v, id);
+    if (window.location.hash === h) { window.scrollTo(0, 0); return; }
+    window.location.hash = h;
   }
+  const openArticle = a => go("article", a.id);
+
+  useEffect(() => {
+    const onKey = e => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || (e.key === "/" && !typing)) { e.preventDefault(); setSearchOpen(true); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  let view = route.view;
+  if (view==="dashboard" && !currentUser) view = "auth";
+  if (view==="admin" && currentUser?.role!=="Admin") view = "home";
+  const isCat = view==="reality-check"||view==="mind-mechanics"||view==="toolkit";
+  const current = view==="article" ? articles.find(a => a && a.isApproved && String(a.id)===String(route.id)) : null;
+
+  useEffect(() => {
+    const base = "The Safe Space Blog";
+    const cat = CATS.find(c=>c.id===view);
+    document.title =
+      current ? `${current.title} · ${base}` :
+      cat ? `${cat.label} · ${base}` :
+      view==="talk" ? `Talk to someone · ${base}` :
+      view==="auth" ? `Sign in · ${base}` :
+      `${base} · Stories, explainers and coping tools`;
+  }, [view, current]);
 
   return (
     <>
       <style>{CSS}</style>
       <div style={{minHeight:"100vh",display:"flex",flexDirection:"column"}}>
+        <a href="#main" className="skip">Skip to content</a>
         <CrisisBar/>
-        <Header view={view} setView={safeSetView} currentUser={currentUser} setCurrentUser={setCurrentUser}/>
-        <main style={{flex:1}}>
-          {view==="home"&&<HomeView articles={articles} setView={safeSetView} onRead={setReadArticle}/>}
-          {(view==="reality-check"||view==="mind-mechanics"||view==="toolkit")&&<CategoryView category={view} articles={articles} onRead={setReadArticle}/>}
+        <Header view={current ? current.category : view} setView={go} currentUser={currentUser} setCurrentUser={setCurrentUser} onSearch={()=>setSearchOpen(true)}/>
+        <main id="main" style={{flex:1}} key={view + (route.id||"")} className="page-in">
+          {view==="home"&&<HomeView articles={articles} setView={go} onRead={openArticle}/>}
+          {isCat&&<CategoryView category={view} articles={articles} onRead={openArticle}/>}
+          {view==="article"&&<ArticlePage article={current} articles={articles} loaded={loaded} onRead={openArticle} setView={go}/>}
           {view==="talk"&&<TalkPage/>}
-          {view==="auth"&&<AuthView users={users} setUsers={setUsers} setCurrentUser={setCurrentUser} setView={setView}/>}
+          {view==="auth"&&<AuthView users={users} setUsers={setUsers} setCurrentUser={setCurrentUser} setView={go}/>}
           {view==="dashboard"&&currentUser&&<DashboardView currentUser={currentUser} articles={articles} setArticles={setArticles}/>}
           {view==="admin"&&currentUser?.role==="Admin"&&<AdminView articles={articles} setArticles={setArticles} pass={currentUser.pass}/>}
         </main>
-        <Footer setView={safeSetView}/>
-        {readArticle&&<ArticleModal article={readArticle} onClose={()=>setReadArticle(null)}/>}
+        <Footer setView={go}/>
+        {searchOpen&&<SearchOverlay articles={articles} onClose={()=>setSearchOpen(false)} onRead={a=>{setSearchOpen(false);openArticle(a);}}/>}
       </div>
     </>
   );
