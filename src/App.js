@@ -53,146 +53,160 @@ const STATUS_META = {
   rejected: { label:"Rejected", badge:"badge-coral" },
 };
 
+// ─── Brand ────────────────────────────────────────────────────────────────────
+// Deep forest + sunrise gold, with one colour world per section.
+const K = {
+  ink:"#14201B", paper:"#FBF8F2", forest:"#173B31", forestDeep:"#0E261F",
+  sun:"#F4B942", clay:"#E2724A", line:"rgba(20,32,27,0.12)",
+};
+const CAT_STYLE = {
+  "reality-check": { bg:"#F7DECF", deep:"#A8401F", art:["#F1C3A7","#E2724A","#F4B942","#8C3416"], blurb:"Real stories from people your age about what it actually felt like." },
+  "mind-mechanics":{ bg:"#DEDFF8", deep:"#3B3D9C", art:["#C3C5F3","#6E72D8","#F4B942","#2A2C78"], blurb:"What's going on in your brain and body, explained without the jargon." },
+  "toolkit":       { bg:"#D6E9D3", deep:"#2C6743", art:["#B6D9B0","#4E9A68","#F4B942","#1E4D31"], blurb:"Small, specific things to try when a day gets heavy." },
+};
+
 // ─── CSS ──────────────────────────────────────────────────────────────────────
-// Editorial, paper-and-ink look. Kept deliberately plain: one accent colour,
-// real typographic hierarchy, thin rules instead of floating cards.
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Work+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;}
-body{font-family:'Work Sans',system-ui,sans-serif;background:${C.offwhite};color:${C.charcoal};font-size:16px;line-height:1.55;}
-.serif{font-family:'Newsreader',Georgia,serif;font-weight:500;letter-spacing:-0.01em;}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:${K.paper};color:${K.ink};font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+.serif,.display{font-family:'Bricolage Grotesque','DM Sans',sans-serif;font-weight:700;letter-spacing:-0.025em;}
 button{cursor:pointer;font-family:inherit;}
 input,select,textarea{font-family:inherit;}
 a{color:inherit;text-decoration:none;}
-::selection{background:${C.goldLight};}
+::selection{background:${K.sun};color:${K.ink};}
+:focus-visible{outline:3px solid ${K.sun};outline-offset:2px;}
 
-.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px;}
 
-.nav-link{font-size:15px;font-weight:500;color:${C.charcoal};padding:4px 0;background:none;border:none;
-  text-decoration:underline;text-decoration-color:transparent;text-underline-offset:6px;text-decoration-thickness:2px;
-  transition:text-decoration-color .15s;}
-.nav-link:hover{text-decoration-color:${C.border};}
-.nav-link.active{text-decoration-color:${C.teal600};}
-
-.btn-primary{background:${C.teal700};color:#fff;border:1px solid ${C.teal700};padding:10px 18px;
-  border-radius:4px;font-size:14px;font-weight:600;transition:background .15s;}
-.btn-primary:hover{background:${C.teal800};}
-.btn-primary:disabled{opacity:0.45;cursor:not-allowed;}
-
-.btn-ghost{background:transparent;color:${C.charcoal};border:1px solid ${C.borderMid};
-  padding:9px 16px;border-radius:4px;font-size:14px;font-weight:500;transition:background .15s,border-color .15s;}
-.btn-ghost:hover{background:${C.cream};border-color:${C.charcoal};}
-
-.btn-gold{background:${C.charcoal};color:${C.offwhite};border:1px solid ${C.charcoal};padding:10px 18px;
-  border-radius:4px;font-size:14px;font-weight:600;transition:background .15s;}
-.btn-gold:hover{background:#000;}
-
-.btn-danger{background:${C.crisis};color:#fff;border:none;padding:9px 16px;
-  border-radius:4px;font-size:14px;font-weight:600;transition:background .15s;}
+/* buttons */
+.btn-primary{background:${K.forest};color:#fff;border:none;padding:12px 22px;border-radius:999px;font-size:15px;font-weight:600;transition:transform .15s,background .15s;}
+.btn-primary:hover{background:${K.forestDeep};}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+.btn-ghost{background:transparent;color:${K.ink};border:1.5px solid ${K.line};padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:border-color .15s,background .15s;}
+.btn-ghost:hover{border-color:${K.ink};}
+.btn-gold{background:${K.sun};color:${K.ink};border:none;padding:15px 26px;border-radius:999px;font-size:16px;font-weight:700;transition:transform .15s,box-shadow .15s;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(244,185,66,.35);}
+.btn-light{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35);padding:14px 24px;border-radius:999px;font-size:16px;font-weight:600;transition:border-color .15s,background .15s;}
+.btn-light:hover{border-color:#fff;background:rgba(255,255,255,.06);}
+.btn-danger{background:${C.crisis};color:#fff;border:none;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:700;}
 .btn-danger:hover{background:#7a1a1a;}
-
-.btn-warn{background:#fff;color:${C.crisis};border:1px solid ${C.crisis};
-  padding:8px 15px;border-radius:4px;font-size:14px;font-weight:600;transition:background .15s;}
+.btn-warn{background:#fff;color:${C.crisis};border:1.5px solid ${C.crisis};padding:10px 18px;border-radius:999px;font-size:14px;font-weight:700;}
 .btn-warn:hover{background:${C.crisisBg};}
 
-.card{background:#fff;border-radius:6px;border:1px solid ${C.border};padding:1.5rem;}
-.card-hover{transition:border-color .15s;}
-.card-hover:hover{border-color:${C.charcoal};}
-
-.badge{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.02em;padding:0;border-radius:0;background:none!important;}
-.badge-teal{color:${C.teal700};}
-.badge-coral{color:${C.coral600};}
-.badge-amber{color:${C.amber600};}
-.badge-blue{color:${C.blue600};}
-.badge-green{color:${C.green600};}
-/* status badges in the admin table keep a little background so they scan */
-.admin-table .badge,.status-pill .badge{padding:2px 8px!important;border-radius:3px;border:1px solid currentColor;}
-
-.section-label{font-size:13px;font-weight:600;color:${C.mid};}
-
-.input-field{width:100%;padding:10px 12px;border-radius:4px;border:1px solid ${C.borderMid};
-  font-size:15px;background:#fff;color:${C.charcoal};transition:border-color .15s;outline:none;}
-.input-field:focus{border-color:${C.charcoal};box-shadow:0 0 0 3px ${C.goldLight};}
-
-.modal-overlay{position:fixed;inset:0;background:rgba(30,28,25,0.55);
-  display:flex;align-items:flex-start;justify-content:center;z-index:1000;overflow-y:auto;padding:4vh 0;}
-
-.tabs{display:flex;gap:0;border-bottom:1px solid ${C.border};}
-.tab{flex:1;padding:10px;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-size:14px;font-weight:500;
-  background:transparent;color:${C.mid};}
-.tab.active{color:${C.charcoal};border-bottom-color:${C.charcoal};font-weight:600;}
-
+/* shared bits used by admin + dashboard */
+.card{background:#fff;border-radius:16px;border:1px solid ${K.line};padding:1.5rem;}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;}
+.badge-teal{background:#DEDFF8;color:#3B3D9C;}
+.badge-coral{background:#F7DECF;color:#A8401F;}
+.badge-amber{background:#D6E9D3;color:#2C6743;}
+.badge-blue{background:${C.blue50};color:${C.blue600};}
+.badge-green{background:${C.green50};color:${C.green600};}
+.section-label{font-size:13px;font-weight:600;color:${C.mid};letter-spacing:.01em;}
+.input-field{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${K.line};font-size:15px;background:#fff;color:${K.ink};outline:none;transition:border-color .15s;}
+.input-field:focus{border-color:${K.forest};box-shadow:0 0 0 4px rgba(244,185,66,.35);}
+.modal-overlay{position:fixed;inset:0;background:rgba(14,38,31,.6);display:flex;align-items:flex-start;justify-content:center;z-index:1000;overflow-y:auto;padding:4vh 0;backdrop-filter:blur(3px);}
+.tabs{display:flex;gap:4px;background:#F1EDE4;border-radius:999px;padding:4px;}
+.tab{flex:1;padding:9px;border-radius:999px;border:none;font-size:14px;font-weight:600;background:transparent;color:${C.mid};}
+.tab.active{background:#fff;color:${K.ink};box-shadow:0 1px 4px rgba(0,0,0,.08);}
 .hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.5rem;}
-
-.video-wrap{position:relative;padding-bottom:56.25%;background:${C.cream};border-radius:4px;overflow:hidden;margin-bottom:1rem;}
+.video-wrap{position:relative;padding-bottom:56.25%;background:#F1EDE4;border-radius:14px;overflow:hidden;margin-bottom:1rem;}
 .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
-
-.crisis-bar{background:${C.charcoal};color:${C.offwhite};text-align:center;font-size:13px;padding:8px 16px;}
-.crisis-bar a{text-decoration:underline;text-underline-offset:3px;}
-
-.article-image{width:100%;border-radius:4px;object-fit:cover;max-height:220px;margin-bottom:1rem;}
-
-.upload-zone{border:1px dashed ${C.borderMid};border-radius:6px;padding:2rem;text-align:center;
-  cursor:pointer;transition:border-color .15s,background .15s;}
-.upload-zone:hover,.upload-zone.drag{border-color:${C.charcoal};background:${C.cream};}
-
-.revision-comment{background:${C.goldBg};border-left:3px solid ${C.gold};
-  padding:12px 14px;font-size:14px;line-height:1.65;margin-bottom:10px;}
-.admin-edit-diff{background:${C.blue50};border-left:3px solid ${C.blue600};
-  padding:12px 14px;font-size:13px;font-style:italic;color:${C.blue800};margin-bottom:10px;}
-
-.msg-crisis-card{background:${C.crisisBg};border:1px solid rgba(155,34,34,0.3);border-left:4px solid ${C.crisis};
-  border-radius:4px;padding:18px 20px;font-size:15px;line-height:1.6;}
-.chat-input-page{flex:1;padding:12px 14px;border-radius:4px;border:1px solid ${C.borderMid};
-  font-size:15px;outline:none;resize:none;min-height:46px;max-height:120px;line-height:1.5;background:#fff;}
-
+.article-image{width:100%;border-radius:12px;object-fit:cover;max-height:220px;margin-bottom:1rem;}
+.upload-zone{border:2px dashed ${K.line};border-radius:14px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
+.upload-zone:hover,.upload-zone.drag{border-color:${K.forest};background:#F1EDE4;}
+.revision-comment{background:${C.goldBg};border-left:3px solid ${K.sun};border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.65;margin-bottom:10px;}
+.admin-edit-diff{background:${C.blue50};border-left:3px solid ${C.blue600};border-radius:8px;padding:12px 14px;font-size:13px;font-style:italic;color:${C.blue800};margin-bottom:10px;}
+.msg-crisis-card{background:${C.crisisBg};border:1px solid rgba(155,34,34,.2);border-radius:20px;padding:22px 24px;font-size:15px;line-height:1.6;}
+.chat-input-page{flex:1;padding:12px 14px;border-radius:12px;border:1.5px solid ${K.line};font-size:15px;outline:none;resize:none;min-height:46px;max-height:120px;line-height:1.5;background:#fff;}
 .admin-table{width:100%;border-collapse:collapse;font-size:14px;}
-.admin-table th{text-align:left;padding:10px 14px;border-bottom:2px solid ${C.charcoal};color:${C.charcoal};
-  font-weight:600;font-size:13px;}
-.admin-table td{padding:13px 14px;border-bottom:1px solid ${C.border};vertical-align:top;}
+.admin-table th{text-align:left;padding:10px 14px;border-bottom:2px solid ${K.ink};font-weight:600;font-size:13px;}
+.admin-table td{padding:13px 14px;border-bottom:1px solid ${K.line};vertical-align:top;}
+.doc-analysis{background:#F1EDE4;border-radius:14px;padding:1.25rem;margin-top:14px;}
 
-.doc-analysis{background:${C.cream};border:1px solid ${C.border};border-radius:4px;padding:1.25rem;margin-top:14px;}
+/* header */
+.topbar{background:${K.forestDeep};color:rgba(255,255,255,.82);font-size:13px;text-align:center;padding:9px 16px;}
+.topbar a{color:#fff;font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+.site-header{position:sticky;top:0;z-index:50;background:rgba(251,248,242,.88);backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid transparent;transition:border-color .2s;}
+.site-header.scrolled{border-bottom-color:${K.line};}
+.brand{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;letter-spacing:-0.03em;color:${K.ink};}
+.nav-link{font-size:15px;font-weight:500;color:${K.ink};padding:8px 14px;border-radius:999px;background:none;border:none;transition:background .15s;}
+.nav-link:hover{background:rgba(20,32,27,.06);}
+.nav-link.active{background:${K.ink};color:#fff;}
 
-/* public pages */
-.masthead-name{font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:600;letter-spacing:-0.015em;color:${C.charcoal};}
-.post-row{display:grid;grid-template-columns:1fr 150px;gap:24px;padding:22px 0;border-top:1px solid ${C.border};cursor:pointer;}
-.post-row:hover .post-title{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;}
-.post-row img{width:150px;height:105px;object-fit:cover;border-radius:3px;}
-.post-row.no-thumb{grid-template-columns:1fr;}
-.post-title{font-family:'Newsreader',Georgia,serif;font-weight:500;font-size:23px;line-height:1.25;letter-spacing:-0.01em;margin:4px 0 6px;color:${C.charcoal};}
-.post-excerpt{font-size:15px;color:${C.mid};line-height:1.6;}
-.post-meta{font-size:13px;color:${C.muted};margin-top:8px;}
-.featured{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:start;padding:8px 0 40px;cursor:pointer;}
-.featured.no-img{grid-template-columns:1fr;max-width:760px;}
-.featured:hover .featured-title{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px;}
-.featured-media img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;}
-.featured-title{font-family:'Newsreader',Georgia,serif;font-weight:500;font-size:clamp(30px,4.2vw,44px);line-height:1.1;letter-spacing:-0.02em;margin:8px 0 14px;}
-.reader{font-family:'Newsreader',Georgia,serif;font-size:20px;line-height:1.7;color:${C.charcoal};}
+/* hero */
+.hero{background:${K.forest};color:#fff;position:relative;overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:32px;min-height:560px;}
+.hero h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(44px,6.4vw,84px);line-height:.98;letter-spacing:-0.045em;}
+.hero h1 em{font-style:normal;color:${K.sun};}
+.hero p{font-size:19px;line-height:1.6;color:rgba(255,255,255,.78);max-width:500px;margin-top:22px;}
+.hero-art{align-self:end;width:100%;height:auto;display:block;}
+.chips{display:flex;gap:10px;flex-wrap:wrap;}
+.chip{padding:10px 18px;border-radius:999px;font-size:15px;font-weight:600;border:none;transition:transform .15s;}
+.chip:hover{transform:translateY(-2px);}
+
+/* cards */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.story{cursor:pointer;display:flex;flex-direction:column;}
+.story .cover{border-radius:18px;overflow:hidden;aspect-ratio:4/3;position:relative;background:#eee;}
+.story .cover svg,.story .cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1);}
+.story:hover .cover svg,.story:hover .cover img{transform:scale(1.04);}
+.story h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px;line-height:1.18;letter-spacing:-0.02em;margin:16px 0 8px;}
+.story:hover h3{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;}
+.story p{font-size:15px;color:${C.mid};line-height:1.6;}
+.meta{font-size:13px;color:${C.muted};margin-top:12px;}
+.cat-tag{font-size:13px;font-weight:700;margin-top:16px;}
+
+.lead{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;cursor:pointer;}
+.lead .cover{border-radius:24px;overflow:hidden;aspect-ratio:5/4;}
+.lead .cover svg,.lead .cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.7,.2,1);}
+.lead:hover .cover svg,.lead:hover .cover img{transform:scale(1.03);}
+.lead h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4vw,52px);line-height:1.02;letter-spacing:-0.035em;margin:14px 0 16px;}
+.lead:hover h2{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px;}
+
+.cat-band{border-radius:28px;padding:44px 44px 48px;}
+.cat-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:32px;}
+.cat-head h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4vw,48px);letter-spacing:-0.035em;line-height:1;}
+.more{background:${K.ink};color:#fff;border:none;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;}
+.more:hover{background:#000;}
+
+.help-band{background:${K.sun};border-radius:28px;padding:48px;display:grid;grid-template-columns:1.3fr 1fr;gap:32px;align-items:center;}
+.help-band h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(30px,3.6vw,46px);letter-spacing:-0.035em;line-height:1.02;}
+
+.write-band{background:${K.ink};color:#fff;border-radius:28px;padding:48px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+
+/* reader */
+.reader{font-family:'Newsreader',Georgia,serif;font-size:21px;line-height:1.7;color:${K.ink};}
 .reader p{margin-bottom:1.1em;}
-.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  border-bottom:2px solid ${C.charcoal};padding-bottom:10px;margin-bottom:4px;}
-.text-link{background:none;border:none;padding:0;font-size:14px;font-weight:500;color:${C.charcoal};
-  text-decoration:underline;text-underline-offset:4px;text-decoration-color:${C.borderMid};}
-.text-link:hover{text-decoration-color:${C.charcoal};}
-.feel-btn{text-align:left;padding:12px 14px;border-radius:4px;font-size:15px;background:#fff;border:1px solid ${C.borderMid};color:${C.charcoal};}
-.feel-btn:hover{border-color:${C.charcoal};}
-.feel-btn.on{background:${C.charcoal};color:${C.offwhite};border-color:${C.charcoal};}
+.reader p:first-child::first-letter{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;float:left;font-size:3.4em;line-height:.9;padding:6px 10px 0 0;color:${K.forest};}
 
-@media(max-width:760px){
-  .featured{grid-template-columns:1fr;gap:18px;}
-  .post-row{grid-template-columns:1fr 96px;gap:14px;}
-  .post-row img{width:96px;height:80px;}
-  .post-title{font-size:20px;}
-  .reader{font-size:18px;}
+.feel-btn{text-align:left;padding:16px 18px;border-radius:16px;font-size:16px;font-weight:600;background:#fff;border:1.5px solid ${K.line};color:${K.ink};transition:border-color .15s,transform .15s;}
+.feel-btn:hover{border-color:${K.ink};transform:translateY(-1px);}
+.feel-btn.on{background:${K.forest};color:#fff;border-color:${K.forest};}
+
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both;}
+.rise.d1{animation-delay:.08s}.rise.d2{animation-delay:.16s}.rise.d3{animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.rise{animation:none}*{transition:none!important}}
+
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;min-height:0;padding-top:56px;}
+  .grid-3{grid-template-columns:1fr 1fr;}
+  .lead{grid-template-columns:1fr;gap:24px;}
+  .help-band{grid-template-columns:1fr;padding:36px 28px;}
+  .cat-band{padding:32px 24px 36px;border-radius:22px;}
+  .write-band{padding:36px 28px;}
 }
 @media(max-width:640px){
+  .wrap{padding:0 18px;}
   .nav-desktop{display:none!important;}
-  .nav-mobile{display:flex!important;}
+  .grid-3{grid-template-columns:1fr;}
   .hub-grid{grid-template-columns:1fr;}
-  .header-actions{gap:12px!important;}
-  .header-actions button{font-size:13px!important;}
-  .masthead-name{font-size:19px;}
+  .brand{font-size:18px;}
+  .hero p{font-size:17px;}
+  .reader{font-size:19px;}
 }
 `;
 
@@ -204,7 +218,7 @@ function prettyDate(s){
   const d = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
   return d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
 }
-function excerpt(body, n=170){
+function excerpt(body, n=150){
   const text = String(body||"").replace(/\s+/g," ").trim();
   if (text.length <= n) return text;
   const cut = text.slice(0, n);
@@ -217,10 +231,53 @@ function readMins(body){
 function byNewest(a, b){
   return String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")) || Number(b.id) - Number(a.id);
 }
+function seeded(str){
+  let h = 2166136261;
+  for (const ch of String(str)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 10000) / 10000; };
+}
+
+// Generated cover art so every post has a picture, even without an upload.
+// Each post gets its own arrangement of sun, hills and dots from its title.
+function Cover({ article }){
+  if (article.imageDataUrl) return <img src={article.imageDataUrl} alt=""/>;
+  const st = CAT_STYLE[article.category] || CAT_STYLE["reality-check"];
+  const [bg, main, sun, deep] = st.art;
+  const r = seeded(String(article.id) + article.title);
+  const sx = 80 + r()*240, sy = 70 + r()*70, sr = 34 + r()*36;
+  const h1 = 170 + r()*40, h2 = 200 + r()*40;
+  const variant = Math.floor(r()*3);
+  const dots = Array.from({length:14},()=>[r()*400, r()*140, 1.2 + r()*2.2]);
+  return (
+    <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
+      <rect width="400" height="300" fill={bg}/>
+      {dots.map(([x,y,s],i)=><circle key={i} cx={x} cy={y} r={s} fill={deep} opacity=".18"/>)}
+      {variant===0 && <circle cx={sx} cy={sy} r={sr} fill={sun}/>}
+      {variant===1 && <path d={`M${sx-sr} ${sy} a${sr} ${sr} 0 0 1 ${sr*2} 0 z`} fill={sun}/>}
+      {variant===2 && <><circle cx={sx} cy={sy} r={sr} fill="none" stroke={sun} strokeWidth="10"/><circle cx={sx} cy={sy} r={sr*0.45} fill={sun}/></>}
+      <path d={`M0 ${h1} C 90 ${h1-50}, 170 ${h1+30}, 260 ${h1-20} S 380 ${h1-10}, 400 ${h1-30} V300 H0 Z`} fill={main}/>
+      <path d={`M0 ${h2} C 120 ${h2-40}, 220 ${h2+25}, 400 ${h2-35} V300 H0 Z`} fill={deep}/>
+    </svg>
+  );
+}
+
+function HeroArt(){
+  return (
+    <svg className="hero-art" viewBox="0 0 560 480" aria-hidden="true">
+      <circle cx="330" cy="190" r="118" fill={K.sun}/>
+      <circle cx="330" cy="190" r="160" fill="none" stroke={K.sun} strokeOpacity=".25" strokeWidth="2"/>
+      <circle cx="330" cy="190" r="205" fill="none" stroke={K.sun} strokeOpacity=".12" strokeWidth="2"/>
+      {[[70,70],[120,140],[470,60],[520,150],[40,200],[200,40],[430,250]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r={i%2?2:3} fill="#fff" opacity=".55"/>)}
+      <path d="M0 330 C 110 260, 200 330, 300 290 S 480 250, 560 280 V480 H0 Z" fill="#2E6A55"/>
+      <path d="M0 380 C 140 330, 260 400, 380 350 S 520 340, 560 330 V480 H0 Z" fill="#4E9A68"/>
+      <path d="M0 430 C 160 400, 300 450, 560 400 V480 H0 Z" fill={K.forestDeep}/>
+    </svg>
+  );
+}
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
 function CrisisBar(){
-  return <div className="crisis-bar">Having a hard time right now? Call or text <a href="tel:988"><strong>988</strong></a>. It's free, confidential and open 24/7.</div>;
+  return <div className="topbar">Having a hard time right now? Call or text <a href="tel:988">988</a>. Free, confidential, 24/7.</div>;
 }
 
 function Logo({ size=36 }){
@@ -228,65 +285,78 @@ function Logo({ size=36 }){
 }
 
 function Header({ view, setView, currentUser, setCurrentUser }){
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(()=>{
+    const on = () => setScrolled(window.scrollY > 8);
+    on(); window.addEventListener("scroll", on, { passive:true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
   return (
-    <header style={{background:C.offwhite,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:50}}>
-      <div className="wrap" style={{minHeight:64,display:"flex",alignItems:"center",gap:28}}>
-        <button onClick={()=>setView("home")} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",cursor:"pointer",flexShrink:0}}>
-          <Logo size={34}/>
-          <span className="masthead-name">The Safe Space Blog</span>
+    <header className={`site-header ${scrolled?"scrolled":""}`}>
+      <div className="wrap" style={{height:70,display:"flex",alignItems:"center",gap:24}}>
+        <button onClick={()=>setView("home")} style={{display:"flex",alignItems:"center",gap:10,background:"none",border:"none",flexShrink:0}}>
+          <Logo size={36}/>
+          <span className="brand">The Safe Space Blog</span>
         </button>
-        <nav className="nav-desktop" style={{display:"flex",gap:22,flex:1}}>
+        <nav className="nav-desktop" style={{display:"flex",gap:4,flex:1,justifyContent:"center"}}>
           {CATS.map(c=><button key={c.id} className={`nav-link ${view===c.id?"active":""}`} onClick={()=>setView(c.id)}>{c.label.replace(/^The /,"")}</button>)}
         </nav>
-        <div className="header-actions" style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:18,flexShrink:0}}>
-          <button className={`nav-link ${view==="talk"?"active":""}`} style={{color:C.crisis,fontWeight:600}} onClick={()=>setView("talk")}>Get help</button>
-          {currentUser ? (
+        <div className="header-actions" style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+          <span className="acct" style={{display:"contents"}}>{currentUser ? (
             <>
-              <button className="nav-link" onClick={()=>setView(currentUser.role==="Admin"?"admin":"dashboard")}>
-                {currentUser.role==="Admin" ? "Admin" : "My submissions"}
-              </button>
-              <button className="nav-link" style={{color:C.mid}} onClick={()=>{setCurrentUser(null);setView("home");}}>Sign out</button>
+              <button className="nav-link" onClick={()=>setView(currentUser.role==="Admin"?"admin":"dashboard")}>{currentUser.role==="Admin" ? "Admin" : "My posts"}</button>
+              <button className="nav-link" onClick={()=>{setCurrentUser(null);setView("home");}}>Sign out</button>
             </>
           ) : (
-            <button className="nav-link" style={{color:C.mid}} onClick={()=>setView("auth")}>Sign in</button>
-          )}
+            <button className="nav-link" onClick={()=>setView("auth")}>Sign in</button>
+          )}</span>
+          <button className="btn-primary" style={{padding:"10px 18px",fontSize:14}} onClick={()=>setView("talk")}>Get help</button>
         </div>
       </div>
-      <nav className="nav-mobile wrap" style={{display:"none",gap:18,paddingBottom:10,overflowX:"auto"}}>
-        {CATS.map(c=><button key={c.id} className={`nav-link ${view===c.id?"active":""}`} style={{fontSize:14,whiteSpace:"nowrap"}} onClick={()=>setView(c.id)}>{c.label.replace(/^The /,"")}</button>)}
+      <nav className="nav-mobile wrap" style={{display:"none",gap:6,paddingBottom:12,overflowX:"auto"}}>
+        {CATS.map(c=><button key={c.id} className={`nav-link ${view===c.id?"active":""}`} style={{fontSize:14,whiteSpace:"nowrap",background:view===c.id?K.ink:"rgba(20,32,27,.06)"}} onClick={()=>setView(c.id)}>{c.label.replace(/^The /,"")}</button>)}
+        <span style={{flex:1}}/>
+        {currentUser ? (
+          <>
+            <button className="nav-link" style={{fontSize:14,whiteSpace:"nowrap"}} onClick={()=>setView(currentUser.role==="Admin"?"admin":"dashboard")}>{currentUser.role==="Admin" ? "Admin" : "My posts"}</button>
+            <button className="nav-link" style={{fontSize:14,whiteSpace:"nowrap"}} onClick={()=>{setCurrentUser(null);setView("home");}}>Sign out</button>
+          </>
+        ) : <button className="nav-link" style={{fontSize:14,whiteSpace:"nowrap"}} onClick={()=>setView("auth")}>Sign in</button>}
       </nav>
+      <style>{`@media(max-width:640px){.nav-mobile{display:flex!important}.header-actions .acct{display:none!important}}`}</style>
     </header>
   );
 }
 
 function Footer({ setView }){
-  const linkStyle = {display:"block",background:"none",border:"none",color:C.charcoal,fontSize:14,padding:"3px 0",cursor:"pointer",textAlign:"left",fontFamily:"inherit"};
+  const link = {display:"block",background:"none",border:"none",color:"rgba(255,255,255,.85)",fontSize:15,padding:"5px 0",textAlign:"left",fontFamily:"inherit"};
   return (
-    <footer style={{borderTop:`2px solid ${C.charcoal}`,marginTop:"4rem",padding:"2.5rem 0 2rem",background:C.cream}}>
+    <footer style={{background:K.forestDeep,color:"#fff",marginTop:"6rem",padding:"4.5rem 0 2.5rem"}}>
       <div className="wrap">
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"2rem",marginBottom:"2rem"}}>
-          <div>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-              <Logo size={32}/>
-              <span className="masthead-name" style={{fontSize:19}}>The Safe Space Blog</span>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"2.5rem",marginBottom:"3.5rem"}}>
+          <div style={{gridColumn:"span 1"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+              <Logo size={36}/>
+              <span className="brand" style={{color:"#fff"}}>The Safe Space Blog</span>
             </div>
-            <p style={{fontSize:14,lineHeight:1.65,color:C.mid,maxWidth:300}}>Stories, explainers and coping tools about mental health, written for and by people figuring it out.</p>
+            <p style={{fontSize:15,lineHeight:1.65,color:"rgba(255,255,255,.65)",maxWidth:300}}>Stories, explainers and coping tools about mental health, for and by people figuring it out.</p>
           </div>
           <div>
-            <p style={{fontSize:13,fontWeight:600,marginBottom:8}}>Read</p>
-            {CATS.map(c=><button key={c.id} onClick={()=>setView(c.id)} style={linkStyle}>{c.label}</button>)}
-            <button onClick={()=>setView("auth")} style={linkStyle}>Write for us</button>
+            <p style={{fontSize:13,fontWeight:700,marginBottom:12,color:K.sun}}>Read</p>
+            {CATS.map(c=><button key={c.id} onClick={()=>setView(c.id)} style={link}>{c.label}</button>)}
+            <button onClick={()=>setView("auth")} style={link}>Write for us</button>
           </div>
           <div>
-            <p style={{fontSize:13,fontWeight:600,marginBottom:8}}>If you need help now</p>
-            <p style={{fontSize:14,lineHeight:1.9}}>
-              Call or text <a href="tel:988" style={{fontWeight:600,textDecoration:"underline"}}>988</a> (Suicide &amp; Crisis Lifeline)<br/>
-              Text <strong>HOME</strong> to <a href="sms:741741?body=HOME" style={{textDecoration:"underline"}}>741741</a> (Crisis Text Line)<br/>
+            <p style={{fontSize:13,fontWeight:700,marginBottom:12,color:K.sun}}>Need help now</p>
+            <p style={{fontSize:15,lineHeight:2,color:"rgba(255,255,255,.85)"}}>
+              Call or text <a href="tel:988" style={{color:"#fff",fontWeight:700,textDecoration:"underline"}}>988</a><br/>
+              Text HOME to <a href="sms:741741?body=HOME" style={{color:"#fff",fontWeight:700,textDecoration:"underline"}}>741741</a><br/>
               Outside the US: <a href="https://findahelpline.com" target="_blank" rel="noreferrer" style={{textDecoration:"underline"}}>findahelpline.com</a>
             </p>
           </div>
         </div>
-        <p style={{borderTop:`1px solid ${C.border}`,paddingTop:"1.25rem",fontSize:12,lineHeight:1.7,color:C.muted}}>
+        <div style={{fontFamily:"'Bricolage Grotesque',sans-serif",fontWeight:800,fontSize:"clamp(48px,11vw,150px)",letterSpacing:"-0.05em",lineHeight:.85,color:"rgba(255,255,255,.07)",userSelect:"none",marginBottom:"2rem"}}>safe space</div>
+        <p style={{borderTop:"1px solid rgba(255,255,255,.12)",paddingTop:"1.5rem",fontSize:12,lineHeight:1.7,color:"rgba(255,255,255,.45)"}}>
           The Safe Space Blog is an educational and peer-support site. It isn't a medical provider and doesn't diagnose or treat anything, so please don't use it in place of professional care. In an emergency, call 911 or go to your nearest emergency room.
         </p>
       </div>
@@ -294,35 +364,29 @@ function Footer({ setView }){
   );
 }
 
-// ─── Article list pieces ──────────────────────────────────────────────────────
-function Thumb({ article }){
-  if (article.imageDataUrl) return <img src={article.imageDataUrl} alt=""/>;
-  return null;
-}
-
-function PostRow({ article, onClick, showCat=true }){
+// ─── Article pieces ───────────────────────────────────────────────────────────
+function StoryCard({ article, onClick, showCat=true }){
   const cat = CATS.find(c=>c.id===article.category);
-  const hasThumb = !!article.imageDataUrl;
+  const st = CAT_STYLE[article.category];
   return (
-    <article className={`post-row ${hasThumb?"":"no-thumb"}`} onClick={()=>onClick(article)}>
-      <div>
-        {showCat && cat && <span className={`badge ${cat.badge}`}>{cat.label}</span>}
-        <h3 className="post-title">{article.title}</h3>
-        <p className="post-excerpt">{excerpt(article.body)}</p>
-        <p className="post-meta">{article.authorName} · {prettyDate(article.submittedAt)} · {readMins(article.body)} min read{article.videoUrl ? " · includes video" : ""}</p>
-      </div>
-      {hasThumb && <Thumb article={article}/>}
+    <article className="story" onClick={()=>onClick(article)}>
+      <div className="cover"><Cover article={article}/></div>
+      {showCat && cat && <span className="cat-tag" style={{color:st?.deep}}>{cat.label.replace(/^The /,"")}</span>}
+      <h3>{article.title}</h3>
+      <p>{excerpt(article.body)}</p>
+      <p className="meta">{article.authorName} · {prettyDate(article.submittedAt)} · {readMins(article.body)} min{article.videoUrl ? " · video" : ""}</p>
     </article>
   );
 }
 
 // Kept for any other screen that still renders a card.
 function ArticleCard({ article, onClick }){
-  return <PostRow article={article} onClick={onClick}/>;
+  return <StoryCard article={article} onClick={onClick}/>;
 }
 
 function ArticleModal({ article, onClose }){
   const cat = CATS.find(c=>c.id===article.category);
+  const st = CAT_STYLE[article.category];
   const paras = article.body.split("\n").filter(Boolean);
   useEffect(()=>{
     const onKey = e => { if (e.key==="Escape") onClose(); };
@@ -333,25 +397,27 @@ function ArticleModal({ article, onClose }){
   }, [onClose]);
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <article style={{background:C.offwhite,borderRadius:4,padding:"2.5rem clamp(20px,5vw,56px) 3rem",maxWidth:760,width:"94%",margin:"auto"}} onClick={e=>e.stopPropagation()}>
-        <button onClick={onClose} className="text-link" style={{float:"right",color:C.mid}} aria-label="Close article">Close</button>
-        {cat && <span className={`badge ${cat.badge}`} style={{fontSize:13}}>{cat.label}</span>}
-        <h2 className="serif" style={{fontSize:"clamp(28px,4vw,40px)",lineHeight:1.15,margin:"10px 0 12px"}}>{article.title}</h2>
-        <p style={{fontSize:14,color:C.mid,marginBottom:28}}>By {article.authorName} · {prettyDate(article.submittedAt)} · {readMins(article.body)} min read</p>
-        {article.videoUrl && (
-          <div style={{marginBottom:24}}>
-            <div className="video-wrap"><iframe src={article.videoUrl} title={article.videoCaption||"Video"} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowFullScreen/></div>
-            {article.videoCaption && <p style={{fontSize:13,color:C.muted,marginTop:6}}>{article.videoCaption}</p>}
-          </div>
-        )}
-        {!article.videoUrl && article.imageDataUrl && (
-          <img src={article.imageDataUrl} alt="" style={{width:"100%",borderRadius:4,objectFit:"cover",maxHeight:380,marginBottom:28}}/>
-        )}
-        <div className="reader">
-          {paras.map((p,i)=><p key={i}>{p}</p>)}
+      <article style={{background:K.paper,borderRadius:28,overflow:"hidden",maxWidth:820,width:"94%",margin:"auto"}} onClick={e=>e.stopPropagation()}>
+        <div style={{background:st?.bg||"#eee",padding:"28px clamp(22px,6vw,64px) 36px",position:"relative"}}>
+          <button onClick={onClose} aria-label="Close article" style={{position:"absolute",top:20,right:20,width:40,height:40,borderRadius:"50%",border:"none",background:"rgba(255,255,255,.7)",fontSize:18,fontWeight:700,color:K.ink}}>✕</button>
+          {cat && <span style={{fontSize:14,fontWeight:700,color:st?.deep}}>{cat.label}</span>}
+          <h2 className="display" style={{fontSize:"clamp(30px,4.6vw,50px)",lineHeight:1.02,fontWeight:800,letterSpacing:"-0.04em",margin:"12px 0 16px",maxWidth:640}}>{article.title}</h2>
+          <p style={{fontSize:15,color:C.mid}}>By {article.authorName} · {prettyDate(article.submittedAt)} · {readMins(article.body)} min read</p>
         </div>
-        <div style={{borderTop:`1px solid ${C.border}`,marginTop:28,paddingTop:16,fontSize:14,color:C.mid}}>
-          Struggling with any of this? You can call or text <a href="tel:988" style={{fontWeight:600,textDecoration:"underline"}}>988</a> any time.
+        <div style={{padding:"36px clamp(22px,6vw,64px) 48px"}}>
+          {article.videoUrl && (
+            <div style={{marginBottom:28}}>
+              <div className="video-wrap"><iframe src={article.videoUrl} title={article.videoCaption||"Video"} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowFullScreen/></div>
+              {article.videoCaption && <p style={{fontSize:13,color:C.muted,marginTop:6}}>{article.videoCaption}</p>}
+            </div>
+          )}
+          {!article.videoUrl && article.imageDataUrl && (
+            <img src={article.imageDataUrl} alt="" style={{width:"100%",borderRadius:16,objectFit:"cover",maxHeight:400,marginBottom:32}}/>
+          )}
+          <div className="reader">{paras.map((p,i)=><p key={i}>{p}</p>)}</div>
+          <div style={{marginTop:32,background:"#F1EDE4",borderRadius:16,padding:"18px 20px",fontSize:15,color:K.ink}}>
+            If any of this hit close to home, you can call or text <a href="tel:988" style={{fontWeight:700,textDecoration:"underline"}}>988</a> any time. You don't need to be in crisis to reach out.
+          </div>
         </div>
       </article>
     </div>
@@ -364,69 +430,113 @@ function HomeView({ articles, setView, onRead }){
   const lead = approved[0];
   const leadCat = lead && CATS.find(c=>c.id===lead.category);
   return (
-    <div className="wrap">
-      <section style={{padding:"3.5rem 0 2.5rem",borderBottom:`1px solid ${C.border}`,marginBottom:"2.5rem"}}>
-        <h1 className="serif" style={{fontSize:"clamp(34px,5.5vw,60px)",lineHeight:1.05,letterSpacing:"-0.025em",maxWidth:760}}>
-          You don't have to carry it alone.
-        </h1>
-        <p style={{fontSize:18,color:C.mid,lineHeight:1.6,marginTop:16,maxWidth:600}}>
-          Honest stories, plain-language explainers about how your brain works, and small things you can try when a day gets heavy.
-        </p>
-        <div style={{display:"flex",gap:20,marginTop:24,flexWrap:"wrap",alignItems:"center"}}>
-          <button className="btn-gold" onClick={()=>setView("talk")}>I need to talk to someone</button>
-          <button className="text-link" onClick={()=>setView("auth")}>Share your own story</button>
+    <div>
+      <section className="hero">
+        <div className="wrap hero-grid">
+          <div style={{padding:"72px 0"}}>
+            <h1 className="rise">You don't have to carry it <em>alone.</em></h1>
+            <p className="rise d1">Honest stories, plain-language explainers about how your mind works, and small things you can try when a day gets heavy.</p>
+            <div className="rise d2" style={{display:"flex",gap:12,marginTop:32,flexWrap:"wrap"}}>
+              <button className="btn-gold" onClick={()=>setView("talk")}>I need to talk to someone</button>
+              <button className="btn-light" onClick={()=>document.getElementById("latest")?.scrollIntoView()}>Start reading</button>
+            </div>
+          </div>
+          <HeroArt/>
         </div>
       </section>
 
+      <div className="wrap" style={{paddingTop:28}}>
+        <div className="chips">
+          {CATS.map(c=>(
+            <button key={c.id} className="chip" style={{background:CAT_STYLE[c.id].bg,color:CAT_STYLE[c.id].deep}} onClick={()=>setView(c.id)}>{c.label.replace(/^The /,"")}</button>
+          ))}
+          <button className="chip" style={{background:"#F1EDE4",color:K.ink}} onClick={()=>setView("talk")}>How are you feeling?</button>
+        </div>
+      </div>
+
       {lead && (
-        <section>
-          <p className="section-label" style={{marginBottom:12}}>Newest</p>
-          <article className={`featured ${lead.imageDataUrl?"":"no-img"}`} onClick={()=>onRead(lead)}>
+        <section id="latest" className="wrap" style={{paddingTop:"4rem"}}>
+          <p className="section-label" style={{marginBottom:18}}>Just published</p>
+          <article className="lead" onClick={()=>onRead(lead)}>
+            <div className="cover"><Cover article={lead}/></div>
             <div>
-              {leadCat && <span className={`badge ${leadCat.badge}`} style={{fontSize:13}}>{leadCat.label}</span>}
-              <h2 className="featured-title">{lead.title}</h2>
-              <p style={{fontSize:17,color:C.mid,lineHeight:1.65}}>{excerpt(lead.body, 260)}</p>
-              <p className="post-meta" style={{marginTop:14}}>{lead.authorName} · {prettyDate(lead.submittedAt)} · {readMins(lead.body)} min read</p>
+              {leadCat && <span style={{fontSize:14,fontWeight:700,color:CAT_STYLE[lead.category]?.deep}}>{leadCat.label}</span>}
+              <h2>{lead.title}</h2>
+              <p style={{fontSize:18,color:C.mid,lineHeight:1.6}}>{excerpt(lead.body, 220)}</p>
+              <p className="meta" style={{marginTop:18}}>{lead.authorName} · {prettyDate(lead.submittedAt)} · {readMins(lead.body)} min read</p>
             </div>
-            {lead.imageDataUrl && <div className="featured-media"><img src={lead.imageDataUrl} alt=""/></div>}
           </article>
         </section>
       )}
 
-      {CATS.map(cat=>{
-        const items = approved.filter(a=>a.category===cat.id && a!==lead);
+      {CATS.map((cat, idx)=>{
+        const st = CAT_STYLE[cat.id];
+        const all = approved.filter(a=>a.category===cat.id);
+        const items = all.filter(a=>a!==lead);
         if (!items.length) return null;
         return (
-          <section key={cat.id} style={{paddingTop:"2.5rem"}}>
-            <div className="section-head">
-              <div>
-                <h2 className="serif" style={{fontSize:28}}>{cat.label}</h2>
-                <p style={{fontSize:14,color:C.mid,marginTop:2}}>{cat.desc}</p>
+          <React.Fragment key={cat.id}>
+            <section className="wrap" style={{paddingTop:"4.5rem"}}>
+              <div className="cat-band" style={{background:st.bg}}>
+                <div className="cat-head">
+                  <div>
+                    <h2 style={{color:st.deep}}>{cat.label}</h2>
+                    <p style={{fontSize:17,color:K.ink,opacity:.75,marginTop:10,maxWidth:460}}>{st.blurb}</p>
+                  </div>
+                  <button className="more" onClick={()=>setView(cat.id)}>See all {all.length}</button>
+                </div>
+                <div className="grid-3">{items.slice(0,3).map(a=><StoryCard key={a.id} article={a} onClick={onRead} showCat={false}/>)}</div>
               </div>
-              <button className="text-link" onClick={()=>setView(cat.id)}>All {items.length + (lead?.category===cat.id?1:0)} posts</button>
-            </div>
-            {items.slice(0,3).map(a=><PostRow key={a.id} article={a} onClick={onRead} showCat={false}/>)}
-          </section>
+            </section>
+            {idx===0 && (
+              <section className="wrap" style={{paddingTop:"4.5rem"}}>
+                <div className="help-band">
+                  <div>
+                    <h2>Not sure what you're feeling? Start there.</h2>
+                    <p style={{fontSize:17,marginTop:14,maxWidth:480,lineHeight:1.6}}>Pick the word that fits closest and we'll suggest one small thing to try right now, plus who you can talk to.</p>
+                  </div>
+                  <div style={{display:"flex",gap:10,flexWrap:"wrap",justifyContent:"flex-end"}}>
+                    <button className="btn-primary" style={{padding:"15px 26px",fontSize:16}} onClick={()=>setView("talk")}>Check in with yourself</button>
+                  </div>
+                </div>
+              </section>
+            )}
+          </React.Fragment>
         );
       })}
 
-      {!approved.length && <p style={{color:C.muted,padding:"2rem 0"}}>Loading posts…</p>}
+      <section className="wrap" style={{paddingTop:"4.5rem"}}>
+        <div className="write-band">
+          <div>
+            <h2 className="display" style={{fontSize:"clamp(28px,3.4vw,42px)",fontWeight:800,lineHeight:1.05}}>Been through something? Write about it.</h2>
+            <p style={{fontSize:17,color:"rgba(255,255,255,.7)",marginTop:12,maxWidth:520}}>Every story is read by a real person before it goes up. You can sign it with just your first name.</p>
+          </div>
+          <button className="btn-gold" onClick={()=>setView("auth")}>Share your story</button>
+        </div>
+      </section>
+
+      {!approved.length && <p className="wrap" style={{color:C.muted,padding:"3rem 28px"}}>Loading stories…</p>}
     </div>
   );
 }
 
 function CategoryView({ category, articles, onRead }){
   const cat = CATS.find(c=>c.id===category);
+  const st = CAT_STYLE[category];
   const items = articles.filter(a => a?.isApproved && a.category === category).sort(byNewest);
-
   return (
-    <div className="wrap" style={{paddingTop:"3rem",maxWidth:820}}>
-      <div style={{marginBottom:"1.5rem"}}>
-        <h1 className="serif" style={{fontSize:"clamp(32px,4.5vw,48px)",lineHeight:1.1,letterSpacing:"-0.02em"}}>{cat.label}</h1>
-        <p style={{fontSize:17,color:C.mid,marginTop:8}}>{cat.desc}</p>
+    <div>
+      <section style={{background:st.bg}}>
+        <div className="wrap" style={{padding:"72px 28px 64px"}}>
+          <h1 className="display rise" style={{fontSize:"clamp(44px,7vw,92px)",fontWeight:800,letterSpacing:"-0.045em",lineHeight:.95,color:st.deep}}>{cat.label}</h1>
+          <p className="rise d1" style={{fontSize:20,marginTop:18,maxWidth:560,lineHeight:1.55}}>{st.blurb}</p>
+          <p className="rise d2" style={{fontSize:14,marginTop:18,color:C.mid}}>{items.length} {items.length===1?"story":"stories"}</p>
+        </div>
+      </section>
+      <div className="wrap" style={{paddingTop:"3.5rem"}}>
+        {!items.length ? <p style={{color:C.muted}}>Nothing here yet. If you've got something to say about this, sign in and send it over.</p> :
+          <div className="grid-3" style={{rowGap:48}}>{items.map(a=><StoryCard key={a.id} article={a} onClick={onRead} showCat={false}/>)}</div>}
       </div>
-      {!items.length ? <p style={{color:C.muted,borderTop:`1px solid ${C.border}`,paddingTop:20}}>Nothing here yet. If you have something to say about this, sign in and send it over.</p> :
-        <div style={{borderBottom:`1px solid ${C.border}`}}>{items.map(a=><PostRow key={a.id} article={a} onClick={onRead} showCat={false}/>)}</div>}
     </div>
   );
 }
@@ -436,42 +546,47 @@ function TalkPage(){
   const [feeling, setFeeling] = useState(null);
   const f = FEELINGS.find(x=>x.id===feeling);
   return (
-    <div className="wrap" style={{maxWidth:720,paddingTop:"3rem"}}>
-      <h1 className="serif" style={{fontSize:"clamp(32px,4.5vw,46px)",lineHeight:1.1,letterSpacing:"-0.02em",marginBottom:12}}>Talk to someone</h1>
-      <p style={{fontSize:17,color:C.mid,lineHeight:1.65,marginBottom:28}}>Whatever's going on, you don't have to sort it out by yourself. If you want a real person right now, the numbers below are free and always open. Or tell us roughly how you're feeling and we'll suggest something to try.</p>
-
-      <div className="msg-crisis-card" style={{marginBottom:36}}>
-        <p style={{fontWeight:600,color:C.crisis,marginBottom:12}}>Talk to a real person now. Free, confidential, 24/7.</p>
-        <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-          <a href="tel:988"><button className="btn-danger">Call 988</button></a>
-          <a href="sms:988"><button className="btn-danger">Text 988</button></a>
-          <a href="sms:741741?body=HOME"><button className="btn-warn">Text HOME to 741741</button></a>
-          <a href="https://findahelpline.com" target="_blank" rel="noreferrer"><button className="btn-ghost">Outside the US</button></a>
+    <div>
+      <section style={{background:K.forest,color:"#fff"}}>
+        <div className="wrap" style={{padding:"72px 28px 64px",maxWidth:880}}>
+          <h1 className="display rise" style={{fontSize:"clamp(42px,6.4vw,80px)",fontWeight:800,letterSpacing:"-0.045em",lineHeight:.95}}>Talk to <span style={{color:K.sun}}>someone.</span></h1>
+          <p className="rise d1" style={{fontSize:19,lineHeight:1.6,color:"rgba(255,255,255,.78)",marginTop:20,maxWidth:600}}>Whatever's going on, you don't have to sort it out by yourself. If you want a real person right now, these are free and always open.</p>
+          <div className="rise d2" style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:28}}>
+            <a href="tel:988"><button className="btn-gold">Call 988</button></a>
+            <a href="sms:988"><button className="btn-gold">Text 988</button></a>
+            <a href="sms:741741?body=HOME"><button className="btn-light">Text HOME to 741741</button></a>
+            <a href="https://findahelpline.com" target="_blank" rel="noreferrer"><button className="btn-light">Outside the US</button></a>
+          </div>
+          <p style={{fontSize:14,color:"rgba(255,255,255,.6)",marginTop:18}}>In an emergency, call 911 or go to your nearest emergency room.</p>
         </div>
-        <p style={{fontSize:14,color:C.mid,marginTop:12}}>In an emergency, call 911 or go to your nearest emergency room.</p>
-      </div>
+      </section>
 
-      <h2 className="serif" style={{fontSize:24,marginBottom:12}}>How are you feeling?</h2>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(210px,1fr))",gap:8,marginBottom:24}}>
-        {FEELINGS.map(x=>(
-          <button key={x.id} className={`feel-btn ${feeling===x.id?"on":""}`} onClick={()=>setFeeling(x.id)} aria-pressed={feeling===x.id}>
-            {x.label}
-          </button>
-        ))}
-      </div>
-
-      {f && (
-        <div data-testid="feeling-response" style={{borderTop:`2px solid ${C.charcoal}`,paddingTop:20}}>
-          <p className="reader" style={{fontSize:19,marginBottom:16}}>{f.message}</p>
-          {f.tool && (<>
-            <p style={{fontWeight:600,fontSize:16,marginBottom:8}}>Try this: {f.tool.name}</p>
-            <ol style={{paddingLeft:22,marginBottom:16,lineHeight:1.8,fontSize:16}}>{f.tool.steps.map((s,i)=><li key={i}>{s}</li>)}</ol>
-          </>)}
-          <p style={{fontSize:16,lineHeight:1.7,color:C.mid}}>{f.next}</p>
+      <div className="wrap" style={{maxWidth:880,paddingTop:"3.5rem"}}>
+        <h2 className="display" style={{fontSize:"clamp(28px,3.4vw,40px)",fontWeight:800,marginBottom:8}}>How are you feeling?</h2>
+        <p style={{fontSize:17,color:C.mid,marginBottom:24}}>Pick whatever fits closest. There's no wrong answer.</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:10,marginBottom:28}}>
+          {FEELINGS.map(x=>(
+            <button key={x.id} className={`feel-btn ${feeling===x.id?"on":""}`} onClick={()=>setFeeling(x.id)} aria-pressed={feeling===x.id}>{x.label}</button>
+          ))}
         </div>
-      )}
-
-      <p style={{fontSize:13,color:C.muted,marginTop:36}}>The Safe Space Blog is peer support, not a substitute for professional care.</p>
+        {f && (
+          <div data-testid="feeling-response" className="rise" style={{background:feeling==="crisis"?C.crisisBg:"#fff",border:`1px solid ${K.line}`,borderRadius:24,padding:"32px clamp(22px,4vw,40px)"}}>
+            <p className="reader" style={{fontSize:21,marginBottom:20}}>{f.message}</p>
+            {feeling==="crisis" && (
+              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:18}}>
+                <a href="tel:988"><button className="btn-danger">Call 988</button></a>
+                <a href="sms:988"><button className="btn-danger">Text 988</button></a>
+              </div>
+            )}
+            {f.tool && (<>
+              <p style={{fontWeight:700,fontSize:17,marginBottom:10}}>Try this: {f.tool.name}</p>
+              <ol style={{paddingLeft:22,marginBottom:18,lineHeight:1.85,fontSize:16}}>{f.tool.steps.map((s,i)=><li key={i}>{s}</li>)}</ol>
+            </>)}
+            <p style={{fontSize:16,lineHeight:1.7,color:C.mid}}>{f.next}</p>
+          </div>
+        )}
+        <p style={{fontSize:13,color:C.muted,marginTop:40}}>The Safe Space Blog is peer support, not a substitute for professional care.</p>
+      </div>
     </div>
   );
 }
